@@ -2,4 +2,5 @@
 .cache
 .props
 .target
-bin
+bin/
+obj/Debug
