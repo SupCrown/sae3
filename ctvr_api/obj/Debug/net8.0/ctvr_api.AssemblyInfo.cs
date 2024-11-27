@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ctvr_api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d4c527ea105cb9cf6af27edbcce277e2389c5181")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dcf5b8a38cff7cbabbe9940006c4abe7c5655bb4")]
 [assembly: System.Reflection.AssemblyProductAttribute("ctvr_api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ctvr_api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

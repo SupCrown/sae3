@@ -86,8 +86,6 @@ namespace CTVR_API.Controllers
         [Route("AddUser")]
         public JsonResult AddUser([FromForm] string identifiant, [FromForm] string nom, [FromForm] string prenom, [FromForm] string motDePasse, [FromForm] string role)
         {
-            if (identifiant == null || nom == null || prenom == null || motDePasse == null || role == null) return new JsonResult(false); // si un des champ est vide, ça ne fonctionne pas
-
             // Vérification de la présence de l'utilisateur à entrer dans la base
             string constraintQuery = "SELECT * FROM utilisateurs where identifiant=@identifiant";
 
@@ -145,7 +143,7 @@ namespace CTVR_API.Controllers
                     return new JsonResult(false);
                 }
             }
-
+            
             return new JsonResult(true);
         }
 

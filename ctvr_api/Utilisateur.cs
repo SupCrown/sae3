@@ -5,11 +5,11 @@ namespace CTVR_API
 {
     public class Utilisateur
     {
-        public string identifiant { get; }
-        public string nom { get; }
-        public string prenom { get; }
-        public string motDePasse { get; }
-        public string role { get; }
+        public string identifiant { get; set; }
+        public string nom { get; set; }
+        public string prenom { get; set; }
+        public string motDePasse { get; set; }
+        public string role { get; set; }
 
         public Utilisateur(Dictionary<string, string> fields)
         {
@@ -19,5 +19,6 @@ namespace CTVR_API
             motDePasse = fields["motDePasse"];
             role = fields["role"];
         }
+
     }
 }
