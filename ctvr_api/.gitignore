@@ -3,4 +3,8 @@
 .props
 .target
 bin/
+#obj/Debug/.net8/ref/*
+#obj/Debug/.net8/refint/*
+#obj/Debug/.net8/staticwebassets/*
+#obj/Debug/.net8/*
 obj/Debug
