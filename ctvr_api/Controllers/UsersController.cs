@@ -1,15 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Query;
 using Npgsql;
-using System.Data;
-using System.Data.SqlClient;
-using System.Formats.Tar;
 
 namespace CTVR_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -21,7 +16,6 @@ namespace CTVR_API.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllUsers")]
         public JsonResult GetAllUsers() 
         {
             string query = "SELECT * FROM Utilisateurs";
@@ -51,9 +45,13 @@ namespace CTVR_API.Controllers
         }
 
         [HttpPost]
-        [Route("GetUserById")]
-        public JsonResult GetUserById([FromForm] string identifiant)
+        public JsonResult GetUserById(string? identifiant)
         {
+            if (string.IsNullOrWhiteSpace(identifiant))
+            {
+                return new JsonResult(2); // champ manquant
+            }
+
             string query = "SELECT * FROM Utilisateurs WHERE identifiant=@identifiant";
 
             Utilisateur? user = null;
@@ -75,20 +73,29 @@ namespace CTVR_API.Controllers
                         userFields.Add("motDePasse", reader.GetString(3));
                         userFields.Add("role", reader.GetString(4));
                         user = new Utilisateur(userFields);
+                        return new JsonResult(user);
                     }
                 }
             }
-
-            return new JsonResult(user);
+            return new JsonResult(3); // l'élément n'existe pas
         }
 
         [HttpPost]
-        [Route("AddUser")]
-        public JsonResult AddUser([FromForm] string identifiant, [FromForm] string nom, [FromForm] string prenom, [FromForm] string motDePasse, [FromForm] string role)
+        public JsonResult AddUser(string? identifiant, string? nom, string? prenom, string? motDePasse, string? role)
         {
+            if (string.IsNullOrWhiteSpace(identifiant)
+                || string.IsNullOrWhiteSpace(nom) 
+                || string.IsNullOrWhiteSpace(prenom) 
+                || string.IsNullOrWhiteSpace(motDePasse)
+                || string.IsNullOrWhiteSpace(role)
+                )
+            {
+                return new JsonResult(2); // champ manquant
+            }
+
             // Vérification de la présence de l'utilisateur à entrer dans la base
             string constraintQuery = "SELECT * FROM utilisateurs where identifiant=@identifiant";
-
+            
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
             
@@ -97,7 +104,7 @@ namespace CTVR_API.Controllers
                 cmd.Parameters.AddWithValue("@identifiant", identifiant);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read()) return new JsonResult(false); // si celui-ci existe déjà : on stop;
+                    if (reader.Read()) return new JsonResult(4); // l'élément existe déjà
                 }
             }
 
@@ -115,17 +122,20 @@ namespace CTVR_API.Controllers
                 
                 if(result == 0) // si ca n'a pas fonctionné
                 {
-                    return new JsonResult(false); 
+                    return new JsonResult(5); 
                 }
             }
 
-            return new JsonResult(true);
+            return new JsonResult(1); // fonctionnement correcte
         }
 
         [HttpDelete]
-        [Route("DeleteUser")]
-        public JsonResult DeleteUser([FromForm] string identifiant)
+        public JsonResult DeleteUser(string? identifiant)
         {
+            if (string.IsNullOrWhiteSpace(identifiant))
+            {
+                return new JsonResult(2); // champ manquant
+            }
 
             string query = "DELETE FROM utilisateurs WHERE identifiant=@identifiant";
 
@@ -140,18 +150,22 @@ namespace CTVR_API.Controllers
 
                 if (result == 0) // si ca n'a pas fonctionné
                 {
-                    return new JsonResult(false);
+                    return new JsonResult(3);
                 }
             }
             
-            return new JsonResult(true);
+            return new JsonResult(1);
         }
 
         [HttpPost]
-        [Route("Check")]
-        public JsonResult Check([FromForm] string identifiant, [FromForm] string motDePasse)
+        public JsonResult Check(string? identifiant, string? motDePasse)
         {
-            string query = "SELECT * FROM utilisateur WHERE identifiant=@identifiant AND motdepasse=@motdepasse";
+            if (string.IsNullOrWhiteSpace(identifiant) || string.IsNullOrWhiteSpace(motDePasse))
+            {
+                return new JsonResult(2); // champ manquant
+            }
+
+            string query = "SELECT * FROM utilisateurs WHERE identifiant=@identifiant AND motdepasse=@motdepasse";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
@@ -165,12 +179,11 @@ namespace CTVR_API.Controllers
                 {
                     if (reader.Read())
                     {
-                        return new JsonResult(true);
+                        return new JsonResult(true); // identifiant et mot de passe correspondant
                     }
                 }
             }
-
-            return new JsonResult(false);
+            return new JsonResult(false); // muvais identifiant ou mot de passe
         }
     }
 }
