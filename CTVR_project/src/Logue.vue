@@ -15,7 +15,7 @@
                 v-model="login"
                 placeholder=" "
                 required
-                class="peer w-[110%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none"
+                class="peer w-[110%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black"
                 @focus="onFocus('login')"
                 @blur="onBlur('login')"
               />
@@ -32,34 +32,37 @@
   
             <!-- Champ Mot de passe -->
             <div class="relative m-[20px] flex justify-center">
-              <input
-                :type="passwordInputType"
-                name="Motdepasse"
-                v-model="password"
-                placeholder=" "
-                required
-                class="peer w-[110%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none"
-                @focus="onFocus('password')"
-                @blur="onBlur('password')"
-              />
-              <label
-                :class="{
-                  'absolute top-[-10px] left-[20px] text-sm bg-gray-400 text-white px-2 rounded-[30px] transition-all': true,
-                  'top-[15px] text-lg text-gray-400': !isPasswordFocused && !password,
-                }"
-                class="transition-all duration-300 ease-in-out"
-              >
-                Mot de passe
-              </label>
-               
-            </div>
-            <img
-            :src="passwordInputType === 'password' ? './src/assets/eye-slash-solid.png' : './src/assets/eye-solid.png'"
-            alt="Toggle visibility"
-            @click="togglePasswordVisibility"
-            class="absolute top-1/2 right-3 transform -translate-y-1/2 h-5 cursor-pointer mr-[440px]"
-            />
-  
+              <div>
+                  <input
+                  :type="passwordInputType"
+                  name="Motdepasse"
+                  v-model="password"
+                  placeholder=" "
+                  required
+                  class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black"
+                  @focus="onFocus('password')"
+                  @blur="onBlur('password')"
+                />
+                <label
+                  :class="{
+                    'absolute top-[-10px] left-[20px] text-sm bg-gray-400 text-white px-2 rounded-[30px] transition-all': true,
+                    'top-[15px] text-lg text-gray-400': !isPasswordFocused && !password,
+                  }"
+                  class="transition-all duration-300 ease-in-out"
+                >
+                  Mot de passe
+                </label>
+                
+                </div>
+                <img
+                :src="passwordInputType === 'password' ? './src/assets/eye-slash-solid.png' : './src/assets/eye-solid.png'"
+                alt="Toggle visibility"
+                @click="togglePasswordVisibility"
+                class="absolute top-1/2 transform -translate-y-1/2 h-5 cursor-pointer ml-[250px]"
+                />
+    
+              </div>
+              
             <!-- Bouton Connexion -->
             <div class="relative m-[50px] flex justify-center pt-[50px]">
               <button
