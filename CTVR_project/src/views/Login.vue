@@ -62,9 +62,11 @@
                 @click="togglePasswordVisibility"
                 class="absolute top-1/2 transform -translate-y-1/2 h-5 cursor-pointer ml-[260px]"
                 />
-    
               </div>
-              
+              <div class="text-red-700">
+                <p ref="noInputs" >login et mot de passe requis !</p>
+                <p ref="wrongInputs" >login ou le mot de passe erroné !</p>
+              </div>
             <!-- Bouton Connexion -->
             <div class="relative m-[50px] flex justify-center pt-[50px]">
               <button
@@ -82,6 +84,9 @@
   </template>
   
 <script lang="ts">
+
+import { useTemplateRef, ref } from 'vue'
+let input = useTemplateRef<HTMLParagraphElement>('noInputs')
 
 export default {
   data() {
@@ -101,6 +106,7 @@ export default {
       let data = await res.json()
       if (data == false){
         // on afficeh un message indiquant un champ érroné
+        
       } else if (data == 2) {
         // on affiche un message indiquant la nécessiter de remplir les deux champs
       } else {
