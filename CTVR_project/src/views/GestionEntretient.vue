@@ -16,7 +16,7 @@
               <td><input v-model="row.date" type="date" class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black bg-[white] ml-[3px] "></td>
               <td class="mr-[20px]">
                 <div contenteditable="true" :text-content="row.piece" @input="updatePiece($event, index)"
-                  class="w-[100%] h-[50px] overflow-scroll whitespace-nowrap border font-sans text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 text-black bg-[white] ml-[5px]"
+                  class="w-[100%] h-[50px] overflow-auto whitespace-nowrap border font-sans text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 text-black bg-[white] ml-[5px]"
                 ></div>
               </td>
               <td>
