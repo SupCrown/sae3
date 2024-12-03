@@ -63,11 +63,11 @@
                 class="absolute top-1/2 transform -translate-y-1/2 h-5 cursor-pointer ml-[260px]"
                 />
               </div>
-              <div v-show="isLoginOrPasswordWrong" class="text-red-700">
+              <div v-show="isLoginOrPasswordWrong" class="absolute text-red-700">
                 <p>login ou le mot de passe erroné !</p>
               </div>
             <!-- Bouton Connexion -->
-            <div class="relative m-[50px] flex justify-center pt-[50px]">
+            <div class="relative m-[50px] flex justify-center pt-[15px]">
               <button
                 type="submit"
                 class="bg-[#003E1C] font-150 w-[90%] h-[50px] text-center text-white cursor-pointer rounded-[25px] text-x3.5 border-2 border-[#003E1C] shadow-[0_4px_10px_gray]"
@@ -105,9 +105,6 @@ export default {
       if (data == false){
         // on afficeh un message indiquant un champ érroné
         this.isLoginOrPasswordWrong = true
-      } else if (data == 2) {
-        // on affiche un message indiquant la nécessiter de remplir les deux champs
-        this.isLoginOrPasswordMissing = true
       } else {  
         let role = data['role']
         if (role == "TCN") {
