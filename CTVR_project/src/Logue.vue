@@ -60,7 +60,7 @@
                 :src="passwordInputType === 'password' ? './src/assets/eye-slash-solid.png' : './src/assets/eye-solid.png'"
                 alt="Toggle visibility"
                 @click="togglePasswordVisibility"
-                class="absolute top-1/2 transform -translate-y-1/2 h-5 cursor-pointer ml-[250px]"
+                class="absolute top-1/2 transform -translate-y-1/2 h-5 cursor-pointer ml-[260px]"
                 />
     
               </div>
