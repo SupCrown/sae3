@@ -8,7 +8,7 @@
           <h2 class="text-[250%] text-black">Connexion</h2>
         </div>
         <div name="coteright" class="pt-[80px] flex justify-center w-[462px]">
-          <form @submit.prevent="onSubmit">
+          <form @submit.prevent="onSubmit()">
             <!-- Champ Login -->
             <div class="relative m-[20px] flex justify-center">
               <input type="text" name="Login"
@@ -82,9 +82,6 @@
   </template>
   
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-  let login = ref<HTMLInputElement>("login-ref");
-  let mdp = ref<HTMLInputElement>("mdp-ref");
 
 export default {
   data() {
@@ -97,15 +94,19 @@ export default {
     };
   },
   methods: {
-    Check(){
-      fetch('https://localhost:7109/api/Users/Check?identifiant=' + login.value + '&' + 'motDePasse=' + mdp.value).then(
-        reponse => reponse.json()).then(
-          json => console.log(json)
-        );
-  
+    async Check(){
+      let res = await fetch("https://localhost:7109/api/Users/Check?identifiant=" + this.login + "&motDePasse=" + this.password, {
+        "method": "POST",
+      })
+      let data = await res.json()
+      if (!data){
+        
+      } else {
+        
+      }
     },
     // Méthode de gestion du focus (au clic sur le champ)
-    onFocus(field) {
+    onFocus(field: string) {
       if (field === 'login') {
         this.isLoginFocused = true;
       } else if (field === 'password') {
@@ -113,7 +114,7 @@ export default {
       }
     },
     // Méthode de gestion du blur (perte de focus)
-    onBlur(field) {
+    onBlur(field: string) {
       if (field === 'login') {
         this.isLoginFocused = false;
       } else if (field === 'password') {
