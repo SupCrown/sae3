@@ -5,14 +5,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import App from './App.vue'
 import Login from './Login.vue'
-import DéclarationAccident from './views/DéclarationAccident.vue'
+import DeclarationAccident from './views/DéclarationAccident.vue'
+import GestionEntretiens from  './views/GestionEntretient.vue'
 
 const router = createRouter({
     history: createWebHistory(),
     routes: [
         {path: '/', name: 'Login', component: Login},
-        {path: '/declaration', name: 'Declaration', component: DéclarationAccident}
-
+        {path: '/declarationAccident', name: 'DeclarationAccident', component: DeclarationAccident},
+        {path: '/gestionEntretiens', name: 'GestionEntretiens', component: GestionEntretiens}
     ]
 })
 
