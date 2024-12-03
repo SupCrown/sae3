@@ -104,7 +104,14 @@ export default {
       } else if (data == 2) {
         // on affiche un message indiquant la nécessiter de remplir les deux champs
       } else {
-        this.$router.push("/gestionEntretiens") // changer la page actuelle
+        let role = data['role']
+        if (role == "TCN") {
+          this.$router.push("/gestionEntretiens")
+        } else if (role == "CHF") {
+          this.$router.push("/declarationAccident")
+        } else {
+          this.$router.push("/gestionEntretiens") // changer la page actuelle
+        }
       }
     },
     // Méthode de gestion du focus (au clic sur le champ)
