@@ -17,6 +17,6 @@ const router = createRouter({
     ]
 })
 
-createApp(DeclarationAccident)
+createApp(GestionEntretiens)
 .use(router)
 .mount('#app')
