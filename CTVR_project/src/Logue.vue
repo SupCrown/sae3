@@ -14,6 +14,7 @@
               <input type="text" name="Login"
                 v-model="login"
                 placeholder=" "
+                ref="login-ref"
                 required
                 class="peer w-[110%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black"
                 @focus="onFocus('login')"
@@ -37,6 +38,7 @@
                   :type="passwordInputType"
                   name="Motdepasse"
                   v-model="password"
+                  ref="mdp-ref"
                   placeholder=" "
                   required
                   class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black"
@@ -68,6 +70,7 @@
               <button
                 type="submit"
                 class="bg-[#003E1C] font-150 w-[90%] h-[50px] text-center text-white cursor-pointer rounded-[25px] text-x3.5 border-2 border-[#003E1C] shadow-[0_4px_10px_gray]"
+                @click="Check()"
               >
                 Connexion
               </button>
@@ -80,6 +83,8 @@
   
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+  let login = ref<HTMLInputElement>("login-ref");
+  let mdp = ref<HTMLInputElement>("mdp-ref");
 
 export default {
   data() {
@@ -92,6 +97,13 @@ export default {
     };
   },
   methods: {
+    Check(){
+      fetch('https://localhost:7109/api/Users/Check?identifiant=' + login.value + '&' + 'motDePasse=' + mdp.value).then(
+        reponse => reponse.json()).then(
+          json => console.log(json)
+        );
+  
+    },
     // Méthode de gestion du focus (au clic sur le champ)
     onFocus(field) {
       if (field === 'login') {
