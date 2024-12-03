@@ -32,23 +32,35 @@
                     <label  class="text-black">Code intempérie</label> 
                 </div>
                 <div>
-                    <input type="date" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[20px] mb-[10px]">
-                    <input type="" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[10px]">
+                    <select class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[20px] mb-[10px]">
+                        <option></option>
+                        <option></option>
+                        <option></option>
+                    </select>
+                    <select class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[20px] mb-[10px]">
+                        <option></option>
+                        <option>brouillard</option>
+                        <option>Pluie</option>
+                    </select>
                 </div>
-                    <input type="" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center  w-[200px]">
+                    <select class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center  w-[200px]">
+                        <option></option>
+                        <option></option>
+                        <option></option>
+                    </select>
                
             </section> 
             <label class="text-black mb-[10px]">Information des tier impliqués et blessés</label>
-            <section>]
+            <section>
                 <div class="border rounded-[20px] w-[700px]">
                     <div>
                         <label class="text-black mr-[150px] ml-[30px]">Nom tier</label>
                         <label class="text-black mr-[150px]">Prénom tier</label>
                         <label class="text-black">Âge tier</label>
                     </div><div>
-                        <input type="number" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] ml-[20px] mr-[20px]">
+                        <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] ml-[20px] mr-[20px]">
                         <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[20px]">
-                        <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px]">
+                        <input type="number" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px]">
                     </div>
                     <div>
                         <label class="text-black ml-[30px]">Adresse tier</label>
@@ -65,16 +77,16 @@
                 <button class="ml-[30px] mt-[10px] bg-[darkgray] border rounded-[30px] w-[200px] h-[30px] text-black">+ Ajouter un tier</button>
             </section>
             <label class="text-black">Information des tier dont du matériel a été endommagé</label>
-            <section>]
+            <section>
                 <div class="border rounded-[20px] w-[700px]">
                     <div>
                         <label class="text-black mr-[150px] ml-[30px]">Nom tier</label>
                         <label class="text-black mr-[150px]">Prénom tier</label>
                         <label class="text-black">Âge tier</label>
                     </div><div>
-                        <input type="number" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] ml-[20px] mr-[20px]">
+                        <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] ml-[20px] mr-[20px]">
                         <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[20px]">
-                        <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px]">
+                        <input type="number" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px]">
                     </div>
                     <div>
                         <label class="text-black ml-[30px]">Adresse tier</label>
@@ -122,8 +134,5 @@
 </template>
 
 
-<script lang="ts">
-export default{
-    
-}
+<script>
 </script>
