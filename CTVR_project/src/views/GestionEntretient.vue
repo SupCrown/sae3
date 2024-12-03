@@ -25,7 +25,7 @@
               </td>
               <td>
                 <button 
-                  :class="{'bg-green-500': row.started, 'bg-white': !row.started}"
+                  :class="{'bg-green-500 border-green-500': row.started, 'bg-white': !row.started}"
                   @click.prevent="toggleStart(index)" 
                   class="peer w-[70%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black mr-[5px] ml-[25px]"
                 >
@@ -34,12 +34,15 @@
               </td>
               <td>
                 <button 
-                  :class="{'bg-red-500': row.finished, 'bg-white': !row.finished}"
-                  @click.prevent="toggleFinish(index)" 
+                  :class="{'bg-red-500 border-red-500': row.finished, 'bg-white': !row.finished}"
+                  @click.prevent="delRow(index)"
                   class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black mr-[0px] ml-[5px]"
                 >
                   Finir
                 </button>
+              </td>
+              <td>
+                <button class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black mr-[0px] ml-[5px]">Modif</button>
               </td>
             </tr>  
           </tbody>
@@ -68,7 +71,6 @@
   
       // Fonction pour ajouter une nouvelle ligne
       const addRow = () => {
-        // Pour forcer Vue à bien réagir, nous réassignons rows après ajout
         rows.value = [...rows.value, { name: '', date: '', piece: '', started: false, finished: false }];
       };
   
@@ -82,18 +84,18 @@
         rows.value[index].started = !rows.value[index].started;
       };
   
-      // Fonction pour toggler l'état "Finir" (changer la couleur en rouge)
-      const toggleFinish = (index) => {
-        rows.value[index].finished = !rows.value[index].finished;
+      const delRow = (index) => {
+        rows.value.splice(index, 1);
       };
-  
+
+
       // Retourner les données et les méthodes
       return {
         rows,
         addRow,
         updatePiece,
         toggleStart,
-        toggleFinish
+        delRow
       };
     }
   };
