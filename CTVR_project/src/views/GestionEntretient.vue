@@ -11,40 +11,30 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Boucle pour afficher dynamiquement les lignes -->
             <tr v-for="(row, index) in rows" :key="index">
               <td><input v-model="row.name" type="text" placeholder="..." class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black bg-[white] m-[20px] ml-[0px] mr-[2px]"></td>
               <td><input v-model="row.date" type="date" class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black bg-[white] ml-[3px] "></td>
               <td class="mr-[20px]">
-                <div
-                  contenteditable="true"
-                  :text-content="row.piece"
-                  @input="updatePiece($event, index)"
+                <div contenteditable="true" :text-content="row.piece" @input="updatePiece($event, index)"
                   class="w-[100%] h-[50px] overflow-scroll whitespace-nowrap border font-sans text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 text-black bg-[white] ml-[5px]"
                 ></div>
               </td>
               <td>
-                <button 
-                  :class="{'bg-green-500 border-green-500': row.started, 'bg-white': !row.started}"
-                  @click.prevent="toggleStart(index)" 
-                  class="peer w-[70%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black mr-[5px] ml-[25px]"
-                >
+                <button :class="{'bg-green-500 border-green-500 pointer-events-none': row.started, 'bg-white': !row.started}" @click.prevent="toggleStart(index)" 
+                  class="peer w-[70%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black mr-[5px] ml-[25px]">
                   Commencer
                 </button>
               </td>
               <td>
-                <button 
-                  :class="{'bg-red-500 border-red-500': row.finished, 'bg-white': !row.finished}"
-                  @click.prevent="delRow(index)"
-                  class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black mr-[0px] ml-[5px]"
-                >
+                <button :class="{'bg-red-500 border-red-500': row.finished, 'bg-white': !row.finished}" @click.prevent="delRow(index)"
+                  class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black mr-[0px] ml-[5px]">
                   Finir
                 </button>
               </td>
               <td>
                 <button class="peer w-[100%] h-[50px] text-base text-center rounded-[25px] shadow-[0_4px_10px_gray] border border-gray-300 focus:outline-none text-black mr-[0px] ml-[5px]">Modif</button>
               </td>
-            </tr>  
+            </tr>       
           </tbody>
           <tfoot>
             <tr>
@@ -71,7 +61,7 @@
   
       // Fonction pour ajouter une nouvelle ligne
       const addRow = () => {
-        rows.value = [...rows.value, { name: '', date: '', piece: '', started: false, finished: false }];
+        rows.value.push({ name: '', date: '', piece: '', started: false, finished: false });
       };
   
       // Fonction pour mettre à jour la valeur de "piece" quand l'utilisateur modifie le contenu du div
