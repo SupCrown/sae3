@@ -105,13 +105,13 @@
             <div>
                  <label class="text-black ml-[30px]">Description des dégâts</label>
             </div><div>
-                <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[5px] text-black text-center w-[500px] h-[100px] mr-[10px] ml-[20px]"> 
+                <textarea class="bg-[lightgray] border-[3px]-black rounded-[5px] text-black  w-[500px] h-[100px] mr-[10px] ml-[20px]"></textarea>
             </div>
             <label class="text-black">Circonstance de l'accident</label>
             <div class="ml-[30px]">
                 <label class="text-black">Description des circonstances</label>
             </div><div>
-                <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[5px] text-black text-center w-[500px] h-[100px] mr-[10px] ml-[20px]">
+                <textarea class="bg-[lightgray] border-[3px]-black rounded-[5px] text-black  w-[500px] h-[100px] mr-[10px] ml-[20px]"></textarea>
             </div>
             <div class="flex flex-row justify-center mt-[20px]">
                 <div class="w-[420px] h-[100px] mr-[50px]">
