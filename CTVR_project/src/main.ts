@@ -4,7 +4,7 @@ import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import App from './App.vue'
-import Login from './Login.vue'
+import Login from './views/Login.vue'
 import DeclarationAccident from './views/DéclarationAccident.vue'
 import GestionEntretiens from  './views/GestionEntretient.vue'
 

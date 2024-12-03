@@ -4,7 +4,7 @@
     <div name="body" class="flex items-center justify-center min-h-[100vh] w-full p-[10px] bg-[#A3A3A3]">
       <div name="rectangle" class="w-[900px] h-[500px] rounded-[10px] border-white p-[40px] bg-[#D9F3E4] border-[12px] border-white flex justify-center">
         <div name="coteleft" class="flex justify-left w-[462px] pl-[50px] pt-[80px] flex-col">
-          <img src="./assets/logo.jpg" class="w-[150px] h-[110px] pl-[10px]" />
+          <img src="../assets/logo.jpg" class="w-[150px] h-[110px] pl-[10px]" />
           <h2 class="text-[250%] text-black">Connexion</h2>
         </div>
         <div name="coteright" class="pt-[80px] flex justify-center w-[462px]">
@@ -99,10 +99,12 @@ export default {
         "method": "POST",
       })
       let data = await res.json()
-      if (!data){
-        
+      if (data == false){
+        // on afficeh un message indiquant un champ érroné
+      } else if (data == 2) {
+        // on affiche un message indiquant la nécessiter de remplir les deux champs
       } else {
-        
+        this.$router.push("/gestionEntretiens") // changer la page actuelle
       }
     },
     // Méthode de gestion du focus (au clic sur le champ)
