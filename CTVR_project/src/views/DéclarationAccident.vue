@@ -11,7 +11,7 @@
             <div class="flex items-align ">
                 <input type="date" class="bg-[lightgray] border-[3px]-black rounded-[5px] text-black text-center w-[200px] mr-[20px]">
                 <input type="time" class="bg-[lightgray] border-[3px]-black rounded-[5px] text-black text-center w-[200px] mr-[20px]">
-                <input type="" class="bg-[lightgray] border-[3px]-black rounded-[5px] text-black text-center w-[200px]">
+                <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[5px] text-black text-center w-[200px]" placeholder="... , ...">
             </div>
            <label class="text-black ">Information de la CTVR</label>
             <section >
@@ -23,7 +23,7 @@
                 <div >
                     <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[20px]">
                     <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[20px]">
-                    <input type="" class="bg-[lightgray] border-[10px]-black-500 rounded-[10px] text-black text-center  w-[200px]">
+                    <input type="text" class="bg-[lightgray] border-[10px]-black-500 rounded-[10px] text-black text-center  w-[200px]" placeholder="AA-000-AA">
                 </div>
                     
                 
@@ -33,20 +33,19 @@
                 </div>
                 <div>
                     <select class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[20px] mb-[10px]">
-                        <option></option>
-                        <option></option>
-                        <option></option>
+                        <option>Départ</option>
+                        <option>Arrivée</option>
                     </select>
                     <select class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[200px] mr-[20px] mb-[10px]">
-                        <option></option>
+                        <option>soleil</option>
                         <option>brouillard</option>
-                        <option>Pluie</option>
+                        <option>pluie</option>
+                        <option>orage</option>
                     </select>
                 </div>
                     <select class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center  w-[200px]">
-                        <option></option>
-                        <option></option>
-                        <option></option>
+                        <option>Arrivée</option>
+                        <option>Départ</option>
                     </select>
                
             </section> 
@@ -67,7 +66,7 @@
                         
                     </div> 
                     <div>
-                        <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[400px] mr-[10px] ml-[20px]">
+                        <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[400px] mr-[10px] ml-[20px]" placeholder="... , ...">
                     </div><div>
                         <label class="text-black ml-[30px]">Nature des blessures</label>
                     </div><div>
@@ -93,7 +92,7 @@
                         
                     </div> 
                     <div>
-                        <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[400px] mr-[10px] ml-[20px]">
+                        <input type="text" class="bg-[lightgray] border-[3px]-black rounded-[8px] text-black text-center w-[400px] mr-[10px] ml-[20px]" placeholder="... , ...">
                     </div><div>
                         <label class="text-black ml-[30px]">Nature des blessures</label>
                     </div><div>
