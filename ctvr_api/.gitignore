@@ -1,0 +1,6 @@
+.vs
+.cache
+.props
+.target
+bin/
+obj/Debug
