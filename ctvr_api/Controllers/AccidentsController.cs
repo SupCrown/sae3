@@ -1,5 +1,4 @@
-﻿using CTVR_API;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 
 namespace ctvr_api.Controllers
@@ -18,7 +17,7 @@ namespace ctvr_api.Controllers
         {
             string query = "SELECT * FROM accident";
 
-            List<Accident> accidents = new List<Accident>();
+            List<Dictionary<string, object?>> accidents = new List<Dictionary<string, object?>>();
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
 
@@ -43,9 +42,7 @@ namespace ctvr_api.Controllers
                         accidentFields.Add("dateClotureDossier", reader.IsDBNull(11) ? null : reader.GetDateTime(11));
                         accidentFields.Add("sommeRecue", reader.IsDBNull(12) ? null : reader.GetInt32(12));
                         accidentFields.Add("intemperie", ItemperieMethodes.parseItemp(reader.GetString(13)));
-                        Accident accident = new Accident(accidentFields);
-                        Console.WriteLine(accident.ToString());
-                        accidents.Add(accident);
+                        accidents.Add(accidentFields);
                     }
                 }
             }
