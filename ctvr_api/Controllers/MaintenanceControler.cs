@@ -23,37 +23,48 @@ namespace CTVR_API.Controllers
             List<Intervention> interventions = new List<Intervention>();
             string connectionString = _configuration.GetConnectionString("ctvr");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
-
-            using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
+            using (var connection = dataSource.OpenConnection())
             {
-                using (var reader = cmd.ExecuteReader()) // exécute la commande et renvoie un reader qui peut parcourir le resultat
+
+                using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
                 {
-                    while (reader.Read()) // pour chacune des lignes renvoyées
+                    using (var reader = cmd.ExecuteReader()) // exécute la commande et renvoie un reader qui peut parcourir le resultat
                     {
-                        Dictionary<string, object> interventionFields = new Dictionary<string, object>();
-                        interventionFields.Add("id", int.Parse(reader.get(0)));
-                        interventionFields.Add("DateEntreeBus", DateTime.Parse(reader.GetString(1)));
-                        interventionFields.Add("Nom", reader.GetString(2));
-                        interventionFields.Add("Piece", reader.GetString(3));
-                        interventionFields.Add("DateFinReparation", DateTime.Parse(reader.GetString(4)));
-                        interventionFields.Add("DateDebutReparation", DateTime.Parse(reader.GetString(5)));
-                        interventions.Add(new Intervention(interventionFields));
+                        while (reader.Read()) // pour chacune des lignes renvoyées
+                        {
+                            Console.WriteLine($"Ligne lue: {reader.GetInt16(0)}"); // Ajout d'un log pour debug
+                            Dictionary<string, object> interventionFields = new Dictionary<string, object>();
+                            interventionFields.Add("norep", reader.GetInt16(0)); // SMALLINT
+                            interventionFields.Add("dateentreebus", 
+                                reader.IsDBNull(1) ? null : reader.GetDateTime(1));
+                            interventionFields.Add("description", reader.GetString(2)); // TEXT
+                            interventionFields.Add("datedevis", reader.GetDateTime(3)); // DATE (NOT NULL)
+                            
+                            // Gestion des champs DATE pouvant être NULL
+                            interventionFields.Add("datedebutreparation", 
+                                reader.IsDBNull(4) ? null : reader.GetDateTime(4));
+                            interventionFields.Add("datefinreparation", 
+                                reader.IsDBNull(5) ? null : reader.GetDateTime(5));
+                            var intervention = new Intervention(interventionFields);
+                            interventions.Add(intervention);
+                        }
                     }
                 }
+                Console.WriteLine($"Nombre total d'interventions : {interventions.Count}");
+                return new JsonResult(interventions);
             }
-
-            return new JsonResult(interventions);
         }
 
+
         [HttpPost]
-        public JsonResult GetInterventionById(string? identifiant)
+        public JsonResult GetInterventionById(Int16? identifiant)
         {
-            if (string.IsNullOrWhiteSpace(identifiant))
+            if (identifiant == null)
             {
                 return new JsonResult(2); // champ manquant
             }
 
-            string query = "SELECT * FROM Utilisateurs WHERE identifiant=@identifiant";
+            string query = "SELECT * FROM Intervention WHERE norep=@identifiant";
 
             Intervention? intervention = null;
             string connectionString = _configuration.GetConnectionString("ctvr");
@@ -61,8 +72,7 @@ namespace CTVR_API.Controllers
 
             using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
             {
-                cmd.Parameters.AddWithValue("@identifiant", identifiant); // ajout du paramètre
-
+                cmd.Parameters.Add("@identifiant", NpgsqlTypes.NpgsqlDbType.Integer).Value = identifiant;
                 using (var reader = cmd.ExecuteReader())
                 {
                     Dictionary<string, object> userFields = new Dictionary<string, object>();
@@ -70,12 +80,12 @@ namespace CTVR_API.Controllers
                     {
 
                         Dictionary<string, object> interventionFields = new Dictionary<string, object>();
-                        interventionFields.Add("id", int.Parse(reader.GetString(0)));
-                        interventionFields.Add("DateEntreeBus", DateTime.Parse(reader.GetString(1)));
-                        interventionFields.Add("Nom", reader.GetString(2));
-                        interventionFields.Add("Piece", reader.GetString(3));
-                        interventionFields.Add("DateFinReparation", DateTime.Parse(reader.GetString(4)));
-                        interventionFields.Add("DateDebutReparation", DateTime.Parse(reader.GetString(5)));
+                        interventionFields.Add("norep", reader.GetInt16(0)); // Si c'est un smallint
+                        interventionFields.Add("dateentreebus", reader.GetDateTime(1));
+                        interventionFields.Add("description", reader.GetString(2));
+                        interventionFields.Add("datedevis", reader.GetDateTime(3));
+                        interventionFields.Add("datefinreparation", reader.GetDateTime(4));
+                        interventionFields.Add("datedebutreparation", reader.GetDateTime(5));
                         intervention = new Intervention(interventionFields);
                         return new JsonResult(intervention);
 
@@ -86,54 +96,47 @@ namespace CTVR_API.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddIntervention(Dictionary<string, object> values)
+public JsonResult AddIntervention(string rawdatedevis, string description)
+{
+
+    DateTime datedevis = DateTime.Parse(rawdatedevis);
+    if(description == null || datedevis == null)
+    {
+        return new JsonResult(2); // champ manquant
+    }
+
+
+
+    string constraintQuery = "SELECT * FROM Intervention WHERE datedevis = @datedevis and description = @description";
+    string connectionString = _configuration.GetConnectionString("ctvr");
+    NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+    using (var cmd = dataSource.CreateCommand(constraintQuery))
+    {
+        cmd.Parameters.AddWithValue("@datedevis", datedevis);
+        cmd.Parameters.AddWithValue("@description", description);
+        using (var reader = cmd.ExecuteReader())
         {
-            if (values["id"] == null
-                || values["DateEntreeBus"]== null
-                || values["Description"]== null
-                || values["Piece"]== null
-                || values["DateFinReparation"]== null
-                || values["DateDebutReparation"]== null)
-
-                
-            {
-                return new JsonResult(2); // champ manquant
-            }
-
-            // Vérification de la présence de l'utilisateur à entrer dans la base
-            string constraintQuery = "SELECT * FROM Intervention where noRep=@identifiant";
-
-            string connectionString = _configuration.GetConnectionString("ctvr");
-            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
-
-            using (var cmd = dataSource.CreateCommand(constraintQuery))
-            {
-                cmd.Parameters.AddWithValue("@identifiant", values["id"]);
-                using (var reader = cmd.ExecuteReader())
-                {
-                    if (reader.Read()) return new JsonResult(4); // l'élément existe déjà
-                }
-            }
-
-
-            string query = "INSERT INTO Intervention(noRep, Description, DateDevis, ) VALUES (@identifiant, @Description, @DateDevis)";
-
-            using (var cmd = dataSource.CreateCommand(query))
-            {
-                cmd.Parameters.AddWithValue("@identifiant", values["id"]);
-                cmd.Parameters.AddWithValue("@Description", values["description"]);
-                cmd.Parameters.AddWithValue("@DateDevis", values["dateDevis"]);
-
-                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
-
-                if (result == 0) // si ca n'a pas fonctionné
-                {
-                    return new JsonResult(5);
-                }
-            }
-
-            return new JsonResult(1); // fonctionnement correcte
+            if (reader.Read())
+                return new JsonResult(4); // L'élément existe déjà
         }
+    }
+
+    string query = "INSERT INTO Intervention ( description, datedevis) VALUES ( @description, @datedevis)";
+    using (var cmd = dataSource.CreateCommand(query))
+    {
+        cmd.Parameters.AddWithValue("@description", description);
+        cmd.Parameters.AddWithValue("@datedevis", datedevis);
+
+        int result = cmd.ExecuteNonQuery();
+        if (result == 0)
+        {
+            return new JsonResult(5); // Erreur d'insertion
+        }
+    }
+
+    return new JsonResult(1); // Ajout réussi
+}
 
         [HttpDelete]
         public JsonResult DeleteUser(string? identifiant)

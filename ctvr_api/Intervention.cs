@@ -3,23 +3,40 @@ using System.Runtime.CompilerServices;
 
 namespace CTVR_API
 {
-    public class Intervention
+public class Intervention
     {
-        public int? id { get; set; }
-        public DateTime? DateEntreeBus { get; set; }
-        public string Description { get; set; }
-        public string? Piece { get; set; }
-        public DateTime? DateFinReparation { get; set; }
-        public DateTime? DateDebutReparation { get; set; }
+        public Int16? norep { get; set; }
+        public DateTime? dateentreebus { get; set; }
+        public string description { get; set; }
+        public string? pieces { get; set; }
+        public DateTime? datefinreparation { get; set; }
+        public DateTime? datedevis { get; set; }
+
+        public DateTime? datedebutreparation { get; set; }
 
         public Intervention(Dictionary<string, object> fields)
         {
-            DateEntreeBus = (DateTime)fields["DateEntreeBus"];
-            Description = (string)fields["Description"];
-            Piece = (string)fields["Piece"];
-            DateFinReparation = (DateTime)fields["DateFinReparation"];
-            DateDebutReparation = (DateTime)fields["DateDebutReparation"];
-        }
+            norep = fields.ContainsKey("norep") ? (Int16?)fields["norep"] : null;
 
+
+            datedevis = fields.ContainsKey("datedevis") && fields["datedevis"] != DBNull.Value
+                ? (DateTime?)fields["datedevis"]
+                : null;
+            dateentreebus = fields.ContainsKey("dateentreebus") && fields["dateentreebus"] != DBNull.Value
+                ? (DateTime?)fields["dateentreebus"]
+                : null;
+            description = fields.ContainsKey("description") && fields["description"] != DBNull.Value
+                ? (string)fields["description"]
+                : string.Empty;
+            pieces = fields.ContainsKey("pieces") && fields["pieces"] != DBNull.Value
+                ? (string?)fields["pieces"]
+                : null;
+            datefinreparation = fields.ContainsKey("datefinreparation") && fields["datefinreparation"] != DBNull.Value
+                ? (DateTime?)fields["datefinreparation"]
+                : null;
+            datedebutreparation = fields.ContainsKey("datedebutreparation") && fields["datedebutreparation"] != DBNull.Value
+                ? (DateTime?)fields["datedebutreparation"]
+                : null;
+        }
     }
 }
