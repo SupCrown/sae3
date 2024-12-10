@@ -1,7 +1,7 @@
 ﻿using Npgsql;
 using System.Runtime.CompilerServices;
 
-namespace ctvr_api
+namespace CTVR_API
 {
     public class Tiers
     {

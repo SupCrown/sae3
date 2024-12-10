@@ -1,4 +1,4 @@
-﻿namespace ctvr_api
+﻿namespace CTVR_API
 {
     public enum Intemperie
     {

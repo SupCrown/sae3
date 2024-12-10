@@ -1,11 +1,11 @@
-﻿namespace ctvr_api
+﻿namespace CTVR_API
 {
     public class Accident
     {
         private int annee { get; set; }
         private int noseq { get; set; }
         private DateOnly? dateAccident { get; set; }
-        private TimeOnly heureAccident { get; set; }
+        private TimeSpan heureAccident { get; set; }
         private string? rue { get; set; }
         private string? codePostal { get; set; }
         private string? ville { get; set; }
@@ -22,7 +22,7 @@
             annee = (int)fields["annee"];
             noseq = (int)fields["noSeq"];
             dateAccident = DateOnly.FromDateTime((DateTime)fields["dateAccident"]);
-            heureAccident = TimeOnly.FromTimeSpan((TimeSpan)fields["heureAccident"]);
+            heureAccident = (TimeSpan)fields["heureAccident"];
             rue = (string)fields["rue"];
             codePostal = (string)fields["codePostal"];
             ville = (string)fields["ville"];
