@@ -22,5 +22,6 @@
                 default: return Intemperie.Autres;
             }
         }
+
     }
 }

@@ -14,7 +14,7 @@ namespace CTVR_API.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAllAccidents(int? filtreItemp)
+        public JsonResult GetAllAccidents()
         {
             string query = "SELECT * FROM accident";
 
@@ -56,6 +56,7 @@ namespace CTVR_API.Controllers
             if (annee==null || noseq == null) return new JsonResult(2); // chanmp manquant
 
             string query = "SELECT * FROM accident WHERE annee=@annee AND noseq=@noseq";
+
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
@@ -90,6 +91,88 @@ namespace CTVR_API.Controllers
         }
 
         [HttpGet]
-        public JsonResult insert(int? annee, int? noseq, DateTime? dateAccident, string? rue, string? code, string? ville, string? )
+        public JsonResult insert(int? annee, int? noseq, DateTime? dateAccident, string? rue, string? codepostal, string? ville, string? resumecirconstances, Intemperie? intemp)
+        {
+            if (annee == null 
+                || noseq == null 
+                || dateAccident == null ||
+                string.IsNullOrWhiteSpace(rue) || 
+                string.IsNullOrWhiteSpace(codepostal) || 
+                string.IsNullOrEmpty(resumecirconstances) || 
+                intemp == null)
+            {
+                return new JsonResult(2);
+            }
+
+            string query = "SELECT * FROM accident WHERE annee=@annee AND noseq=@noseq";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
+
+            using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
+            {
+                cmd.Parameters.AddWithValue("@annee", annee);
+                cmd.Parameters.AddWithValue("@noseq", noseq);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read()) return new JsonResult(4); // l'élément existe déjà
+                }
+
+            }
+
+            query = "INSERT INTO accident(annee, noseq, dateaccident, heureaccident, rue, codepostal, ville, resumecirconstances, dateouverturedossier, sommerecue, codeintemp) VALUES (@annee, @noseq, @dateaccident, @heureaccident, @rue, @codepostal, @ville, @resumecirconstances, @dateouverturedossier, @sommerecue, @intemp)";
+
+            using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
+            {
+                cmd.Parameters.AddWithValue("@annee", annee);
+                cmd.Parameters.AddWithValue("@noseq", noseq);
+                cmd.Parameters.AddWithValue("@dateaccident", DateOnly.FromDateTime((DateTime)dateAccident));
+                cmd.Parameters.AddWithValue("@heureaccident",TimeOnly.FromDateTime((DateTime)dateAccident));
+                cmd.Parameters.AddWithValue("@rue", rue);
+                cmd.Parameters.AddWithValue("@codepostal", codepostal);
+                cmd.Parameters.AddWithValue("@ville", ville);
+                cmd.Parameters.AddWithValue("@resumecirconstances", resumecirconstances);
+                cmd.Parameters.AddWithValue("@dateouverturedossier", DateOnly.FromDateTime(DateTime.Now));
+                cmd.Parameters.AddWithValue("@sommerecue", 0);
+                cmd.Parameters.AddWithValue("@intemp", intemp.ToString().ToLower());
+
+                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie un reader qui peut parcourir le resultat
+
+                if(result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(5);
+                }
+
+            }
+
+            return new JsonResult(1);
+        }
+
+        [HttpDelete]
+        public JsonResult DeleteAccident(int? annee, int? noseq)
+        {
+            if (annee == null || noseq == null) return new JsonResult(2);
+
+            string query = "DELETE FROM accident WHERE annee=@annee AND noseq=@noseq";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                cmd.Parameters.AddWithValue("@annee", annee);
+                cmd.Parameters.AddWithValue("@noseq", noseq);
+
+                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+
+                if (result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(3);
+                }
+            }
+
+            return new JsonResult(1);
+
+        }
     }
 }
