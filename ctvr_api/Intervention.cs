@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace CTVR_API
 {
-public class Intervention
+    public class Intervention
     {
         public Int16? norep { get; set; }
         public DateTime? dateentreebus { get; set; }
@@ -13,6 +13,8 @@ public class Intervention
         public DateTime? datedevis { get; set; }
 
         public DateTime? datedebutreparation { get; set; }
+        public string immat { get; set; }
+
 
         public Intervention(Dictionary<string, object> fields)
         {
@@ -37,6 +39,10 @@ public class Intervention
             datedebutreparation = fields.ContainsKey("datedebutreparation") && fields["datedebutreparation"] != DBNull.Value
                 ? (DateTime?)fields["datedebutreparation"]
                 : null;
+
+            immat = fields.ContainsKey("immat") && fields["immat"] != DBNull.Value
+                ? (string)fields["immat"]
+                : string.Empty;
         }
     }
 }

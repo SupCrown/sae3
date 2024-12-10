@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 
-namespace CTVR_API.Controllers
+namespace ctvr_API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
@@ -21,7 +21,7 @@ namespace CTVR_API.Controllers
             string query = "SELECT * FROM Intervention";
 
             List<Intervention> interventions = new List<Intervention>();
-            string connectionString = _configuration.GetConnectionString("ctvr");
+            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
             using (var connection = dataSource.OpenConnection())
             {
@@ -32,13 +32,14 @@ namespace CTVR_API.Controllers
                     {
                         while (reader.Read()) // pour chacune des lignes renvoyées
                         {
-                            Console.WriteLine($"Ligne lue: {reader.GetInt16(0)}"); // Ajout d'un log pour debug
                             Dictionary<string, object> interventionFields = new Dictionary<string, object>();
                             interventionFields.Add("norep", reader.GetInt16(0)); // SMALLINT
                             interventionFields.Add("dateentreebus", 
                                 reader.IsDBNull(1) ? null : reader.GetDateTime(1));
                             interventionFields.Add("description", reader.GetString(2)); // TEXT
                             interventionFields.Add("datedevis", reader.GetDateTime(3)); // DATE (NOT NULL)
+                            interventionFields.Add("immat", reader.GetString(6)); // TEXT
+
                             
                             // Gestion des champs DATE pouvant être NULL
                             interventionFields.Add("datedebutreparation", 
@@ -50,7 +51,6 @@ namespace CTVR_API.Controllers
                         }
                     }
                 }
-                Console.WriteLine($"Nombre total d'interventions : {interventions.Count}");
                 return new JsonResult(interventions);
             }
         }
@@ -67,7 +67,7 @@ namespace CTVR_API.Controllers
             string query = "SELECT * FROM Intervention WHERE norep=@identifiant";
 
             Intervention? intervention = null;
-            string connectionString = _configuration.GetConnectionString("ctvr");
+            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
@@ -86,6 +86,7 @@ namespace CTVR_API.Controllers
                         interventionFields.Add("datedevis", reader.GetDateTime(3));
                         interventionFields.Add("datefinreparation", reader.GetDateTime(4));
                         interventionFields.Add("datedebutreparation", reader.GetDateTime(5));
+                        interventionFields.Add("immat", reader.GetString(6));
                         intervention = new Intervention(interventionFields);
                         return new JsonResult(intervention);
 
@@ -96,37 +97,44 @@ namespace CTVR_API.Controllers
         }
 
         [HttpPost]
-public JsonResult AddIntervention(string rawdatedevis, string description)
+public JsonResult AddIntervention(string rawdatedevis, string description, string immat)
 {
+    //pense a ajouter les atribut necessaires!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!              
 
     DateTime datedevis = DateTime.Parse(rawdatedevis);
-    if(description == null || datedevis == null)
+    if(description == null || datedevis == null || immat == null)
     {
         return new JsonResult(2); // champ manquant
     }
 
 
 
-    string constraintQuery = "SELECT * FROM Intervention WHERE datedevis = @datedevis and description = @description";
-    string connectionString = _configuration.GetConnectionString("ctvr");
+    string constraintQuery = "SELECT * FROM Intervention WHERE datedevis = @datedevis and description = @description and immat = @immat";
+    string connectionString = _configuration.GetConnectionString("ctvrtestDBConn"); 
     NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
     using (var cmd = dataSource.CreateCommand(constraintQuery))
     {
         cmd.Parameters.AddWithValue("@datedevis", datedevis);
         cmd.Parameters.AddWithValue("@description", description);
+        cmd.Parameters.AddWithValue("@immat", immat);
+
         using (var reader = cmd.ExecuteReader())
         {
             if (reader.Read())
                 return new JsonResult(4); // L'élément existe déjà
         }
     }
+    Console.WriteLine($"Ligne lue: {datedevis}"); // Ajout d'un log pour debug
 
-    string query = "INSERT INTO Intervention ( description, datedevis) VALUES ( @description, @datedevis)";
+
+    string query = "INSERT INTO Intervention (description, datedevis, immat) VALUES ( @description, @datedevis, @immat)";
     using (var cmd = dataSource.CreateCommand(query))
     {
         cmd.Parameters.AddWithValue("@description", description);
         cmd.Parameters.AddWithValue("@datedevis", datedevis);
+        cmd.Parameters.AddWithValue("@immat", immat);
+
 
         int result = cmd.ExecuteNonQuery();
         if (result == 0)
@@ -148,7 +156,7 @@ public JsonResult AddIntervention(string rawdatedevis, string description)
 
             string query = "DELETE FROM utilisateurs WHERE identifiant=@identifiant";
 
-            string connectionString = _configuration.GetConnectionString("ctvr");
+            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(query))
@@ -176,7 +184,7 @@ public JsonResult AddIntervention(string rawdatedevis, string description)
 
             string query = "SELECT * FROM utilisateurs WHERE identifiant=@identifiant AND motdepasse=@motdepasse";
 
-            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestDBConntestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(query))
