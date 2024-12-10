@@ -15,10 +15,18 @@ namespace CTVR_API
         public DateTime? datedebutreparation { get; set; }
         public string immat { get; set; }
 
+        public Int16? annee { get; set; }
+       
+        public Int16? noseq { get; set; }
+
 
         public Intervention(Dictionary<string, object> fields)
         {
             norep = fields.ContainsKey("norep") ? (Int16?)fields["norep"] : null;
+
+            norep = fields.ContainsKey("annee") ? (Int16?)fields["annee"] : null;
+            
+            norep = fields.ContainsKey("noseq") ? (Int16?)fields["noseq"] : null;
 
 
             datedevis = fields.ContainsKey("datedevis") && fields["datedevis"] != DBNull.Value
