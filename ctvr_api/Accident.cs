@@ -2,44 +2,38 @@
 {
     public class Accident
     {
-        private int annee { get; set; }
-        private int noseq { get; set; }
-        private DateOnly? dateAccident { get; set; }
-        private TimeSpan heureAccident { get; set; }
-        private string? rue { get; set; }
-        private string? codePostal { get; set; }
-        private string? ville { get; set; }
-        private string? resumeCirconstances { get; set; }
-        private DateOnly dateOuvertureDossier { get; set; }
-        private DateOnly? dateTransmissionAssur { get; set; }
-        private DateOnly? dateValidationAssur { get; set; }
-        private DateOnly? dateClotureDossier { get; set; }
-        private int? sommeRecue { get; set; }
-        private Intemperie intemperie { get; set; }
+        public int annee { get; set; }
+        public int noseq { get; set; }
+        public DateOnly? dateAccident { get; set; }
+        public TimeSpan heureAccident { get; set; }
+        public string? rue { get; set; }
+        public string? codePostal { get; set; }
+        public string? ville { get; set; }
+        public string? resumeCirconstances { get; set; }
+        public DateOnly dateOuvertureDossier { get; set; }
+        public DateOnly? dateTransmissionAssur { get; set; }
+        public DateOnly? dateValidationAssur { get; set; }
+        public DateOnly? dateClotureDossier { get; set; }
+        public int? sommeRecue { get; set; }
+        public Intemperie intemperie { get; set; }
 
         public Accident(Dictionary<string, object?> fields)
         {
             annee = (int)fields["annee"];
-            noseq = (int)fields["noSeq"];
-            dateAccident = DateOnly.FromDateTime((DateTime)fields["dateAccident"]);
-            heureAccident = (TimeSpan)fields["heureAccident"];
+            noseq = (int)fields["noseq"];
+            dateAccident = (DateOnly)fields["dateaccident"];
+            heureAccident = (TimeSpan)fields["heureaccident"];
             rue = (string)fields["rue"];
-            codePostal = (string)fields["codePostal"];
+            codePostal = (string)fields["codepostal"];
             ville = (string)fields["ville"];
-            resumeCirconstances = (string)fields["resumeCirconstances"];
-            dateOuvertureDossier = DateOnly.FromDateTime((DateTime)fields["dateOuvertureDossier"]);
-            dateTransmissionAssur = fields["dateTransmissionAssur"] == null ? null : DateOnly.FromDateTime((DateTime)fields["dateTransmissionAssur"]);
-            dateValidationAssur = fields["dateValidationAssur"] == null ? null : DateOnly.FromDateTime((DateTime)fields["dateValidationAssur"]);
-            dateClotureDossier = fields["dateClotureDossier"] == null ? null : DateOnly.FromDateTime((DateTime)fields["dateClotureDossier"]);
-            sommeRecue = (int)fields["sommeRecue"];
+            resumeCirconstances = (string)fields["resumecirconstances"];
+            dateOuvertureDossier = (DateOnly)fields["dateouverturedossier"];
+            dateTransmissionAssur = fields["datetransmissionassur"] == null ? null : (DateOnly)fields["datetransmissionassur"];
+            dateValidationAssur = fields["datevalidationassur"] == null ? null : (DateOnly)fields["datevalidationassur"];
+            dateClotureDossier = fields["datecloturedossier"] == null ? null : (DateOnly)fields["datecloturedossier"];
+            sommeRecue = (int)fields["sommerecue"];
             intemperie = (Intemperie)fields["intemperie"];
         }
 
-        public string ToString()
-        {
-            return annee.ToString() + ' ' + noseq.ToString() + ' ' + dateAccident.ToString() + ' ' + heureAccident.ToString() + ' ' + rue + ' ' + ville + ' ' + resumeCirconstances
-                 + ' ' + dateOuvertureDossier.ToString() + ' ' + dateTransmissionAssur.ToString() + ' ' + dateValidationAssur.ToString() + ' ' + dateClotureDossier.ToString()
-                 + ' ' + sommeRecue.ToString() + ' ' + intemperie.ToString();
-        }
     }
 }

@@ -18,7 +18,7 @@ namespace CTVR_API.Controllers
         {
             string query = "SELECT * FROM accident";
 
-            List<Dictionary<string, object?>> accidents = new List<Dictionary<string, object?>>();
+            List<Accident> accidents = new List<Accident>();
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
 
@@ -31,19 +31,19 @@ namespace CTVR_API.Controllers
                         Dictionary<string, object?> accidentFields = new Dictionary<string, object?>();
                         accidentFields.Add("annee", reader.GetInt32(0));
                         accidentFields.Add("noseq", reader.GetInt32(1));
-                        accidentFields.Add("dateaccident", reader.GetDateTime(2));
+                        accidentFields.Add("dateaccident", DateOnly.FromDateTime(reader.GetDateTime(2)));
                         accidentFields.Add("heureaccident", reader.GetTimeSpan(3));
                         accidentFields.Add("rue", reader.GetString(4));
                         accidentFields.Add("codepostal", reader.GetString(5));
                         accidentFields.Add("ville", reader.GetString(6));
                         accidentFields.Add("resumecirconstances", reader.GetString(7));
-                        accidentFields.Add("dateouverturedossier", reader.GetDateTime(8));
-                        accidentFields.Add("datetransmissionassur", reader.IsDBNull(9) ? null : reader.GetDateTime(9));
-                        accidentFields.Add("datevalidationassur", reader.IsDBNull(10) ? null : reader.GetDateTime(10));
-                        accidentFields.Add("datedloturedossier", reader.IsDBNull(11) ? null : reader.GetDateTime(11));
+                        accidentFields.Add("dateouverturedossier", DateOnly.FromDateTime(reader.GetDateTime(8)));
+                        accidentFields.Add("datetransmissionassur", reader.IsDBNull(9) ? null : DateOnly.FromDateTime(reader.GetDateTime(9)));
+                        accidentFields.Add("datevalidationassur", reader.IsDBNull(10) ? null : DateOnly.FromDateTime(reader.GetDateTime(10)));
+                        accidentFields.Add("datecloturedossier", reader.IsDBNull(11) ? null : DateOnly.FromDateTime(reader.GetDateTime(11)));
                         accidentFields.Add("sommerecue", reader.IsDBNull(12) ? null : reader.GetInt32(12));
                         accidentFields.Add("intemperie", ItemperieMethodes.parseItemp(reader.GetString(13)));
-                        accidents.Add(accidentFields);
+                        accidents.Add(new Accident(accidentFields));
                     }
                 }
             }
@@ -68,34 +68,32 @@ namespace CTVR_API.Controllers
                 {
                     if (reader.Read())
                     {
-                        Dictionary<string, object?> accident = new Dictionary<string, object?>();
-                        accident.Add("annee", reader.GetInt32(0));
-                        accident.Add("noseq", reader.GetInt32(1));
-                        accident.Add("dateaccident", reader.GetDateTime(2));
-                        accident.Add("heureaccident", reader.GetTimeSpan(3));
-                        accident.Add("rue", reader.GetString(4));
-                        accident.Add("codepostal", reader.GetString(5));
-                        accident.Add("ville", reader.GetString(6));
-                        accident.Add("resumecirconstances", reader.GetString(7));
-                        accident.Add("dateouverturedossier", reader.GetDateTime(8));
-                        accident.Add("datetransmissionassur", reader.IsDBNull(9) ? null : reader.GetDateTime(9));
-                        accident.Add("datevalidationassur", reader.IsDBNull(10) ? null : reader.GetDateTime(10));
-                        accident.Add("datedloturedossier", reader.IsDBNull(11) ? null : reader.GetDateTime(11));
-                        accident.Add("sommerecue", reader.IsDBNull(12) ? null : reader.GetInt32(12));
-                        accident.Add("intemperie", ItemperieMethodes.parseItemp(reader.GetString(13)));
-                        return new JsonResult(accident);
+                        Dictionary<string, object?> accidentFields = new Dictionary<string, object?>();
+                        accidentFields.Add("annee", reader.GetInt32(0));
+                        accidentFields.Add("noseq", reader.GetInt32(1));
+                        accidentFields.Add("dateaccident", DateOnly.FromDateTime(reader.GetDateTime(2)));
+                        accidentFields.Add("heureaccident", reader.GetTimeSpan(3));
+                        accidentFields.Add("rue", reader.GetString(4));
+                        accidentFields.Add("codepostal", reader.GetString(5));
+                        accidentFields.Add("ville", reader.GetString(6));
+                        accidentFields.Add("resumecirconstances", reader.GetString(7));
+                        accidentFields.Add("dateouverturedossier", DateOnly.FromDateTime(reader.GetDateTime(8)));
+                        accidentFields.Add("datetransmissionassur", reader.IsDBNull(9) ? null : DateOnly.FromDateTime(reader.GetDateTime(9)));
+                        accidentFields.Add("datevalidationassur", reader.IsDBNull(10) ? null : DateOnly.FromDateTime(reader.GetDateTime(10)));
+                        accidentFields.Add("datecloturedossier", reader.IsDBNull(11) ? null : DateOnly.FromDateTime(reader.GetDateTime(11)));
+                        accidentFields.Add("sommerecue", reader.IsDBNull(12) ? null : reader.GetInt32(12));
+                        accidentFields.Add("intemperie", ItemperieMethodes.parseItemp(reader.GetString(13)));
+                        return new JsonResult(new Accident(accidentFields));
                     }
                 }
             }
             return new JsonResult(3); // l'élément n'existe pas
         }
 
-        [HttpGet]
-        public JsonResult insert(int? annee, int? noseq, DateTime? dateAccident, string? rue, string? codepostal, string? ville, string? resumecirconstances, Intemperie? intemp)
+        [HttpPut]
+        public JsonResult Insert(DateTime? dateAccident, string? rue, string? codepostal, string? ville, string? resumecirconstances, Intemperie? intemp)
         {
-            if (annee == null 
-                || noseq == null 
-                || dateAccident == null ||
+            if (dateAccident == null ||
                 string.IsNullOrWhiteSpace(rue) || 
                 string.IsNullOrWhiteSpace(codepostal) || 
                 string.IsNullOrEmpty(resumecirconstances) || 
@@ -103,8 +101,11 @@ namespace CTVR_API.Controllers
             {
                 return new JsonResult(2);
             }
+            
+            int annee = DateTime.Now.Year;
+            int noseq = 1;
 
-            string query = "SELECT * FROM accident WHERE annee=@annee AND noseq=@noseq";
+            string query = "SELECT coalesce(max(noseq),0) FROM accident WHERE annee=@annee;";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
@@ -112,12 +113,10 @@ namespace CTVR_API.Controllers
             using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
             {
                 cmd.Parameters.AddWithValue("@annee", annee);
-                cmd.Parameters.AddWithValue("@noseq", noseq);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read()) return new JsonResult(4); // l'élément existe déjà
+                    if (reader.Read()) noseq = reader.GetInt32(0)+1; // on récupére le prochain numéro séquentiel de l'année en cours
                 }
-
             }
 
             query = "INSERT INTO accident(annee, noseq, dateaccident, heureaccident, rue, codepostal, ville, resumecirconstances, dateouverturedossier, sommerecue, codeintemp) VALUES (@annee, @noseq, @dateaccident, @heureaccident, @rue, @codepostal, @ville, @resumecirconstances, @dateouverturedossier, @sommerecue, @intemp)";
@@ -174,5 +173,189 @@ namespace CTVR_API.Controllers
             return new JsonResult(1);
 
         }
+
+        [HttpPut]
+        public JsonResult PutDateTransmissionAssur(int? annee, int? noseq, DateOnly? date)
+        {
+            if (annee == null || noseq == null)
+            {
+                return new JsonResult(2); // champ.s manquant.s
+            }
+
+            /* exesist-il ? */
+            string query = "SELECT annee FROM accident WHERE annee=@annee AND noseq=@noseq";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                cmd.Parameters.AddWithValue("@annee", annee);
+                cmd.Parameters.AddWithValue("@noseq", noseq);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    /* Si Non : */
+                    if (!reader.Read()) return new JsonResult(3); // l'élément n'existe pas
+                }
+            }
+
+            /* Si Oui :*/
+            query = "UPDATE accident SET datetransmissionassur=@datetransmissionassur";
+
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                if (date == null)
+                {
+                    date = DateOnly.FromDateTime(DateTime.Now);
+                }
+                cmd.Parameters.AddWithValue("@datetransmissionassur", date);
+
+                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+
+                if (result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(5);
+                }
+            }
+            return new JsonResult(1);
+        }
+
+        [HttpPut]
+        public JsonResult PutDateValidationAssur(int? annee, int? noseq, DateOnly? date)
+        {
+            if (annee == null || noseq == null)
+            {
+                return new JsonResult(2); // champ.s manquant.s
+            }
+
+            /* exesist-il ? */
+            string query = "SELECT annee FROM accident WHERE annee=@annee AND noseq=@noseq";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                cmd.Parameters.AddWithValue("@annee", annee);
+                cmd.Parameters.AddWithValue("@noseq", noseq);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    /* Si Non : */
+                    if (!reader.Read()) return new JsonResult(3); // l'élément n'existe pas
+                }
+            }
+
+            /* Si Oui :*/
+            query = "UPDATE accident SET datevalidationassur=@datevalidationassur";
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                if (date == null)
+                {
+                    date = DateOnly.FromDateTime(DateTime.Now);
+                }
+                cmd.Parameters.AddWithValue("@datevalidationassur", date);
+
+                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+
+                if (result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(5);
+                }
+            }
+            return new JsonResult(1);
+        }
+
+        [HttpPut]
+        public JsonResult PutDateClotureDossier(int? annee, int? noseq, DateOnly? date)
+        {
+            if (annee == null || noseq == null)
+            {
+                return new JsonResult(2); // champ.s manquant.s
+            }
+
+            /* exesist-il ? */
+            string query = "SELECT annee FROM accident WHERE annee=@annee AND noseq=@noseq";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                cmd.Parameters.AddWithValue("@annee", annee);
+                cmd.Parameters.AddWithValue("@noseq", noseq);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    /* Si Non : */
+                    if (!reader.Read()) return new JsonResult(3); // l'élément n'existe pas
+                }
+            }
+
+            /* Si Oui :*/
+            query = "UPDATE accident SET datecloturedossier=@datecloturedossier";
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                if (date == null)
+                {
+                    date = DateOnly.FromDateTime(DateTime.Now);
+                }
+                cmd.Parameters.AddWithValue("@datecloturedossier", date);
+
+                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+
+                if (result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(5);
+                }
+            }
+            return new JsonResult(1);
+        }
+
+        [HttpPut]
+        public JsonResult PutSommeRecue(int? annee, int? noseq, int? somme)
+        {
+            if (annee == null || noseq == null || somme == null)
+            {
+                return new JsonResult(2); // champ.s manquant.s
+            }
+
+            /* exesist-il ? */
+            string query = "SELECT annee FROM accident WHERE annee=@annee AND noseq=@noseq";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                cmd.Parameters.AddWithValue("@annee", annee);
+                cmd.Parameters.AddWithValue("@noseq", noseq);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    /* Si Non : */
+                    if (!reader.Read()) return new JsonResult(3); // l'élément n'existe pas
+                }
+            }
+
+            /* Si Oui :*/
+            query = "UPDATE accident SET sommerecue=@sommerecue";
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                cmd.Parameters.AddWithValue("@sommerecue", somme);
+
+                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+
+                if (result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(5);
+                }
+            }
+            return new JsonResult(1);
+        }
+
+        // action pour upadate un accident complet : Admin CTVR
+
     }
 }
