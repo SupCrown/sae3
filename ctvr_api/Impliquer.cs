@@ -2,19 +2,21 @@
 {
     public class Impliquer
     {
-        private Accident accident { get; set; }
-        private Tiers tiers { get; set; }
-        private string? natureBlessures { get; set; }
-        private string? degatsMateriels { get; set; }
-        private int sommeVersee { get; set; }
+        public int annee { get; set; }
+        public int noseq { get; set; }
+        public Tiers tiers { get; set; }
+        public string? natureBlessures { get; set; }
+        public string? degatsMateriels { get; set; }
+        public int? sommeVersee { get; set; }
 
         public Impliquer(Dictionary<string,object> fields)
         {
-            accident = (Accident)fields["accident"];
+            annee = (int)fields["annee"];
+            noseq = (int)fields["noseq"];
             tiers = (Tiers)fields["tiers"];
-            natureBlessures = (string)fields["natureBlessures"];
-            degatsMateriels = (string)fields["degatsMateriels"];
-            sommeVersee = (int)fields["sommeVersee"];
+            natureBlessures = (string)fields["natureblessures"];
+            degatsMateriels = (string)fields["degatsmateriels"];
+            sommeVersee = (int?)fields["sommeversee"];
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ctvr_api;
+using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 
 namespace CTVR_API.Controllers
@@ -18,7 +19,7 @@ namespace CTVR_API.Controllers
         {
             string query = "SELECT * FROM accident";
 
-            List<Accident> accidents = new List<Accident>();
+            List<Dictionary<string, object?>> accidents = []; // [] = new List<Accident>()
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
 
@@ -36,14 +37,24 @@ namespace CTVR_API.Controllers
                         accidentFields.Add("rue", reader.GetString(4));
                         accidentFields.Add("codepostal", reader.GetString(5));
                         accidentFields.Add("ville", reader.GetString(6));
-                        accidentFields.Add("resumecirconstances", reader.GetString(7));
-                        accidentFields.Add("dateouverturedossier", DateOnly.FromDateTime(reader.GetDateTime(8)));
-                        accidentFields.Add("datetransmissionassur", reader.IsDBNull(9) ? null : DateOnly.FromDateTime(reader.GetDateTime(9)));
-                        accidentFields.Add("datevalidationassur", reader.IsDBNull(10) ? null : DateOnly.FromDateTime(reader.GetDateTime(10)));
-                        accidentFields.Add("datecloturedossier", reader.IsDBNull(11) ? null : DateOnly.FromDateTime(reader.GetDateTime(11)));
-                        accidentFields.Add("sommerecue", reader.IsDBNull(12) ? null : reader.GetInt32(12));
-                        accidentFields.Add("intemperie", ItemperieMethodes.parseItemp(reader.GetString(13)));
-                        accidents.Add(new Accident(accidentFields));
+
+                        if (!reader.IsDBNull(11))
+                        {
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Cloturer);
+                        }
+                        else if (!reader.IsDBNull(10))
+                        {
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Valide);
+                        }
+                        else if (!reader.IsDBNull(9))
+                        {
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Transmit);
+                        }
+                        else
+                        {
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Ouvert);
+                        }
+                        accidents.Add(accidentFields);
                     }
                 }
             }
@@ -60,15 +71,19 @@ namespace CTVR_API.Controllers
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
+            Dictionary<string, object?> accidentFields = [];
+
             using (var cmd = dataSource.CreateCommand(query))
             {
                 cmd.Parameters.AddWithValue("@annee", annee);
                 cmd.Parameters.AddWithValue("@noseq", noseq);
                 using (NpgsqlDataReader reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read())
+                    if (!reader.Read())
                     {
-                        Dictionary<string, object?> accidentFields = new Dictionary<string, object?>();
+                        return new JsonResult(3); // l'élément n'existe pas
+                    } else
+                    {
                         accidentFields.Add("annee", reader.GetInt32(0));
                         accidentFields.Add("noseq", reader.GetInt32(1));
                         accidentFields.Add("dateaccident", DateOnly.FromDateTime(reader.GetDateTime(2)));
@@ -83,11 +98,49 @@ namespace CTVR_API.Controllers
                         accidentFields.Add("datecloturedossier", reader.IsDBNull(11) ? null : DateOnly.FromDateTime(reader.GetDateTime(11)));
                         accidentFields.Add("sommerecue", reader.IsDBNull(12) ? null : reader.GetInt32(12));
                         accidentFields.Add("intemperie", ItemperieMethodes.parseItemp(reader.GetString(13)));
-                        return new JsonResult(new Accident(accidentFields));
                     }
                 }
             }
-            return new JsonResult(3); // l'élément n'existe pas
+            
+            List<Impliquer> impliquers = [];
+
+            query = "SELECT annee, noseq, notiers, natureblessures, degatsmateriels, sommeversee, nomtiers, prenomtiers, datenaissance, adressetiers, cptiers, villetiers FROM impliquer join tiers using(notiers) WHERE annee=@annee AND noseq=@noseq";
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                cmd.Parameters.AddWithValue("@annee", annee);
+                cmd.Parameters.AddWithValue("@noseq", noseq);
+                using (NpgsqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Dictionary<string, object?> impliquerFields = [];
+                        Dictionary<string, object?> tiersFields = [];
+                        impliquerFields.Add("annee", annee);
+                        impliquerFields.Add("noseq", noseq);
+                        impliquerFields.Add("natureblessures", reader.GetString(3));
+                        impliquerFields.Add("degatsmateriels", reader.GetString(4));
+                        impliquerFields.Add("sommeversee", reader.IsDBNull(5) ? null : reader.GetInt32(5));
+                        
+                        tiersFields.Add("notiers", reader.GetInt32(2));
+                        tiersFields.Add("nomtiers", reader.GetString(6));
+                        tiersFields.Add("prenomtiers", reader.GetString(7));
+                        tiersFields.Add("datenaissance", DateOnly.FromDateTime(reader.GetDateTime(8)));
+                        tiersFields.Add("adressetiers", reader.GetString(9));
+                        tiersFields.Add("cptiers", reader.GetString(10));
+                        tiersFields.Add("villetiers", reader.GetString(11));
+                        
+                        Tiers tiers = new Tiers(tiersFields);
+                        
+                        impliquerFields.Add("tiers", tiers);
+
+                        impliquers.Add(new Impliquer(impliquerFields));
+                    }
+                }
+            }
+            Accident accident = new Accident(accidentFields);
+            accident.impliquers = impliquers;
+            return new JsonResult(accident);
         }
 
         [HttpPut]
@@ -143,8 +196,10 @@ namespace CTVR_API.Controllers
                 }
 
             }
-
-            return new JsonResult(1);
+            Dictionary<string, int> cleAccident = [];
+            cleAccident.Add("annee", annee);
+            cleAccident.Add("noseq", noseq);
+            return new JsonResult(cleAccident);
         }
 
         [HttpDelete]

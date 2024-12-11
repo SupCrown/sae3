@@ -16,6 +16,7 @@
         public DateOnly? dateClotureDossier { get; set; }
         public int? sommeRecue { get; set; }
         public Intemperie intemperie { get; set; }
+        public List<Impliquer> impliquers { get; set; }
 
         public Accident(Dictionary<string, object?> fields)
         {
@@ -33,6 +34,7 @@
             dateClotureDossier = fields["datecloturedossier"] == null ? null : (DateOnly)fields["datecloturedossier"];
             sommeRecue = (int)fields["sommerecue"];
             intemperie = (Intemperie)fields["intemperie"];
+            impliquers = new List<Impliquer>();
         }
 
     }
