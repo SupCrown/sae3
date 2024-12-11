@@ -44,12 +44,12 @@ namespace CTVR_API.Controllers
                     {
                         while (reader.Read()) // pour chacune des lignes renvoyées
                         {
-                            Dictionary<string, object> interventionFields = new Dictionary<string, object>();
+                            Dictionary<string, object?> interventionFields = new Dictionary<string, object>();
                             interventionFields.Add("norep", reader.GetInt16(0)); // SMALLINT
                             interventionFields.Add("dateentreebus",
                                 reader.IsDBNull(1) ? null : DateOnly.FromDateTime(reader.GetDateTime(1)));
                             interventionFields.Add("description", reader.GetString(2)); // TEXT
-                            interventionFields.Add("datedevis", DateOnly.FromDateTime(reader.GetDateTime(3))); // DATE (NOT NULL)
+                            interventionFields.Add("datedevis",reader.IsDBNull(3) ? null : DateOnly.FromDateTime(reader.GetDateTime(3))); // DATE (NOT NULL)
                             interventionFields.Add("immat", reader.GetString(6)); // TEXT
                             interventionFields.Add("annee",
                                 reader.IsDBNull(7) ? null : reader.GetInt16(7));
