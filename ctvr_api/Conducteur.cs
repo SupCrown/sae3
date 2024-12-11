@@ -6,18 +6,14 @@ namespace CTVR_API
     public class Conducteur
     {
         public Int16 nopermis { get; set; }
-        public DateTime datepermis { get; set; }
+        public DateOnly datepermis { get; set; }
         public string? lieudelivrancepermis { get; set; }
         public DateOnly dateprisefonction { get; set; }
         public string nom { get; set; }
         public string prenom { get; set; }
-
-        public DateTime datenaissance { get; set; }
-
+        public DateOnly datenaissance { get; set; }
         public string? adresse { get; set; }
-
         public string? codepostal { get; set; }
-
         public string? ville { get; set; }
 
 
