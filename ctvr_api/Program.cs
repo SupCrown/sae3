@@ -13,6 +13,9 @@ namespace ctvr_api
 
             var app = builder.Build();
 
+            //Enable CORS
+            app.UseCors(c => c.AllowAnyMethod().AllowAnyOrigin().AllowAnyMethod());
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
