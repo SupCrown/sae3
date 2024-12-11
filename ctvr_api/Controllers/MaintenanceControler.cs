@@ -49,20 +49,22 @@ namespace CTVR_API.Controllers
                             Dictionary<string, object> interventionFields = new Dictionary<string, object>();
                             interventionFields.Add("norep", reader.GetInt16(0)); // SMALLINT
                             interventionFields.Add("dateentreebus",
-                                reader.IsDBNull(1) ? null : reader.GetDateTime(1));
+                                reader.IsDBNull(1) ? null : DateOnly.FromDateTime(reader.GetDateTime(1)));
                             interventionFields.Add("description", reader.GetString(2)); // TEXT
-                            interventionFields.Add("datedevis", reader.GetDateTime(3)); // DATE (NOT NULL)
+                            interventionFields.Add("datedevis", DateOnly.FromDateTime(reader.GetDateTime(3))); // DATE (NOT NULL)
                             interventionFields.Add("immat", reader.GetString(6)); // TEXT
-                            interventionFields.Add("annee", reader.GetInt16(0));
-                            interventionFields.Add("noseq", reader.GetInt16(8)); // SMALLINT
+                            interventionFields.Add("annee", 
+                                reader.IsDBNull(7) ? null : reader.GetInt16(7));
+                            interventionFields.Add("noseq", 
+                                reader.IsDBNull(8) ? null : reader.GetInt16(8)); // SMALLINT
 
 
 
                             // Gestion des champs DATE pouvant être NULL
                             interventionFields.Add("datedebutreparation",
-                                reader.IsDBNull(4) ? null : reader.GetDateTime(4));
+                                reader.IsDBNull(4) ? null : DateOnly.FromDateTime(reader.GetDateTime(4)));
                             interventionFields.Add("datefinreparation",
-                                reader.IsDBNull(5) ? null : reader.GetDateTime(5));
+                                reader.IsDBNull(5) ? null : DateOnly.FromDateTime(reader.GetDateTime(5)));
                             var intervention = new Intervention(interventionFields);
                             interventions.Add(intervention);
                         }
@@ -98,14 +100,14 @@ namespace CTVR_API.Controllers
 
                         Dictionary<string, object> interventionFields = new Dictionary<string, object>();
                         interventionFields.Add("norep", reader.GetInt16(0)); // Si c'est un smallint
-                        interventionFields.Add("dateentreebus", reader.GetDateTime(1));
+                        interventionFields.Add("dateentreebus", DateOnly.FromDateTime(reader.GetDateTime(1)));
                         interventionFields.Add("description", reader.GetString(2));
-                        interventionFields.Add("datedevis", reader.GetDateTime(3));
-                        interventionFields.Add("datefinreparation", reader.GetDateTime(4));
-                        interventionFields.Add("datedebutreparation", reader.GetDateTime(5));
+                        interventionFields.Add("datedevis", DateOnly.FromDateTime(reader.GetDateTime(3)));
+                        interventionFields.Add("datefinreparation", DateOnly.FromDateTime(reader.GetDateTime(4)));
+                        interventionFields.Add("datedebutreparation", DateOnly.FromDateTime(reader.GetDateTime(5)));
                         interventionFields.Add("immat", reader.GetString(6));
-                        interventionFields.Add("annee", reader.GetInt16(0));
-                        interventionFields.Add("noseq", reader.GetInt16(0));
+                        interventionFields.Add("annee", reader.GetInt16(7));
+                        interventionFields.Add("noseq", reader.GetInt16(8));
                         intervention = new Intervention(interventionFields);
                         return new JsonResult(intervention);
 

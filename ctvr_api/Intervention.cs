@@ -6,13 +6,13 @@ namespace CTVR_API
     public class Intervention
     {
         public Int16? norep { get; set; }
-        public DateTime? dateentreebus { get; set; }
+        public DateOnly? dateentreebus { get; set; }
         public string description { get; set; }
         public string? pieces { get; set; }
-        public DateTime? datefinreparation { get; set; }
-        public DateTime? datedevis { get; set; }
+        public DateOnly? datefinreparation { get; set; }
+        public DateOnly? datedevis { get; set; }
 
-        public DateTime? datedebutreparation { get; set; }
+        public DateOnly? datedebutreparation { get; set; }
         public string immat { get; set; }
 
         public Int16? annee { get; set; }
@@ -24,16 +24,16 @@ namespace CTVR_API
         {
             norep = fields.ContainsKey("norep") ? (Int16?)fields["norep"] : null;
 
-            norep = fields.ContainsKey("annee") ? (Int16?)fields["annee"] : null;
+            annee = fields.ContainsKey("annee") ? (Int16?)fields["annee"] : null;
             
-            norep = fields.ContainsKey("noseq") ? (Int16?)fields["noseq"] : null;
+            noseq = fields.ContainsKey("noseq") ? (Int16?)fields["noseq"] : null;
 
 
             datedevis = fields.ContainsKey("datedevis") && fields["datedevis"] != DBNull.Value
-                ? (DateTime?)fields["datedevis"]
+                ? (DateOnly?)fields["datedevis"]
                 : null;
             dateentreebus = fields.ContainsKey("dateentreebus") && fields["dateentreebus"] != DBNull.Value
-                ? (DateTime?)fields["dateentreebus"]
+                ? (DateOnly?)fields["dateentreebus"]
                 : null;
             description = fields.ContainsKey("description") && fields["description"] != DBNull.Value
                 ? (string)fields["description"]
@@ -42,10 +42,10 @@ namespace CTVR_API
                 ? (string?)fields["pieces"]
                 : null;
             datefinreparation = fields.ContainsKey("datefinreparation") && fields["datefinreparation"] != DBNull.Value
-                ? (DateTime?)fields["datefinreparation"]
+                ? (DateOnly?)fields["datefinreparation"]
                 : null;
             datedebutreparation = fields.ContainsKey("datedebutreparation") && fields["datedebutreparation"] != DBNull.Value
-                ? (DateTime?)fields["datedebutreparation"]
+                ? (DateOnly?)fields["datedebutreparation"]
                 : null;
 
             immat = fields.ContainsKey("immat") && fields["immat"] != DBNull.Value
