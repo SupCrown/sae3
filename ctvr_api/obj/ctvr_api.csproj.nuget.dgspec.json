@@ -1,25 +1,28 @@
 {
   "format": 1,
   "restore": {
-    "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj": {}
+    "C:\\Users\\audri\\Documents\\IUT\\A2\\S3\\SAE3\\sae3.01\\ctvr_api\\ctvr_api.csproj": {}
   },
   "projects": {
-    "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj": {
+    "C:\\Users\\audri\\Documents\\IUT\\A2\\S3\\SAE3\\sae3.01\\ctvr_api\\ctvr_api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj",
+        "projectUniqueName": "C:\\Users\\audri\\Documents\\IUT\\A2\\S3\\SAE3\\sae3.01\\ctvr_api\\ctvr_api.csproj",
         "projectName": "ctvr_api",
-        "projectPath": "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj",
-        "packagesPath": "/home/josua/.nuget/packages/",
-        "outputPath": "/home/josua/Bureau/school/sae3.01/ctvr_api/obj/",
+        "projectPath": "C:\\Users\\audri\\Documents\\IUT\\A2\\S3\\SAE3\\sae3.01\\ctvr_api\\ctvr_api.csproj",
+        "packagesPath": "C:\\Users\\audri\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\audri\\Documents\\IUT\\A2\\S3\\SAE3\\sae3.01\\ctvr_api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/josua/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\audri\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -43,10 +46,6 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
-            "Newtonsoft.Json": {
-              "target": "Package",
-              "version": "[13.0.3, )"
-            },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[9.0.1, )"
@@ -75,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/snap/dotnet-sdk/254/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
