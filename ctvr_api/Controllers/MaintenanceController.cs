@@ -8,11 +8,11 @@ namespace CTVR_API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class MaintenanceControler : ControllerBase
+    public class MaintenanceController : ControllerBase
     {
         private IConfiguration _configuration;
 
-        public MaintenanceControler(IConfiguration configuration)
+        public MaintenanceController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -25,12 +25,10 @@ namespace CTVR_API.Controllers
             {
                 case "debutrep": query = "SELECT * FROM Intervention where datedebutreparation is not null and datefinreparation is null"; break;
                 case "finrep": query = "SELECT * FROM Intervention where datefinreparation is not null"; break;
-                case "dateasc": query = "SELECT * FROM Intervention order by datedevis asc;"; break;
-                case "datedesc": query = "SELECT * FROM Intervention order by datedevis desc;"; break;
 
 
                 default:
-                    query = "SELECT * FROM Intervention order by datedevis";
+                    query = "SELECT * FROM Intervention ";
                     break;
             }
 
@@ -53,9 +51,9 @@ namespace CTVR_API.Controllers
                             interventionFields.Add("description", reader.GetString(2)); // TEXT
                             interventionFields.Add("datedevis", DateOnly.FromDateTime(reader.GetDateTime(3))); // DATE (NOT NULL)
                             interventionFields.Add("immat", reader.GetString(6)); // TEXT
-                            interventionFields.Add("annee", 
+                            interventionFields.Add("annee",
                                 reader.IsDBNull(7) ? null : reader.GetInt16(7));
-                            interventionFields.Add("noseq", 
+                            interventionFields.Add("noseq",
                                 reader.IsDBNull(8) ? null : reader.GetInt16(8)); // SMALLINT
 
 
@@ -118,28 +116,54 @@ namespace CTVR_API.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddIntervention(string rawdatedevis, string description, string immat, Int16? annee, Int16? noseq)
+        public JsonResult AddIntervention(string? rawdatedevis, string description, string immat, Int16? annee, Int16? noseq)
         {
+            string constraintQuery = "SELECT * FROM Intervention WHERE description = @description and immat = @immat";
+            string query = "INSERT INTO Intervention (description, immat) VALUES ( @description, @immat)";
 
-            DateTime datedevis = DateTime.Parse(rawdatedevis);
-            if (description == null || datedevis == null || immat == null)
+            if (rawdatedevis != null)
+            {
+                DateOnly datedevis = DateOnly.Parse(rawdatedevis);
+                constraintQuery = "SELECT * FROM Intervention WHERE description = @description and datedevis =@datedevis and immat = @immat";
+                query = "INSERT INTO Intervention (description, immat, datedevis) VALUES ( @description, @immat, @datedevis)";
+                if (annee != null & noseq != null)
+                { 
+                    constraintQuery = "SELECT * FROM Intervention WHERE description = @description and immat = @immat";
+                    query = "INSERT INTO Intervention (description, immat,datedevis, annee, noseq) VALUES ( @description, @immat, @datedevis, @annee, @noseq)";
+                }else
+                {
+                    constraintQuery = "SELECT * FROM Intervention WHERE description = @description and immat = @immat";
+                    query = "INSERT INTO Intervention (description, immat,datedevis) VALUES ( @description, @immat, @datedevis)";
+                }
+
+            }
+
+            if (description == null || immat == null)
             {
                 return new JsonResult(2); // champ manquant
             }
 
 
 
-            string constraintQuery = "SELECT * FROM Intervention WHERE datedevis = @datedevis and description = @description and immat = @immat and annee=@annee and noseq=@noseq";
             string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
             {
-                cmd.Parameters.AddWithValue("@datedevis", datedevis);
+                if (rawdatedevis != null)
+                {
+                    cmd.Parameters.AddWithValue("@datedevis", DateOnly.Parse(rawdatedevis));
+                }
                 cmd.Parameters.AddWithValue("@description", description);
+
                 cmd.Parameters.AddWithValue("@immat", immat);
-                cmd.Parameters.AddWithValue("@annee", annee);
-                cmd.Parameters.AddWithValue("@noseq", noseq);
+
+                if (annee != null & noseq != null)
+                {
+                    cmd.Parameters.AddWithValue("@annee", annee);
+                    cmd.Parameters.AddWithValue("@noseq", noseq);
+                }
+
 
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -149,12 +173,18 @@ namespace CTVR_API.Controllers
             }
 
 
-            string query = "INSERT INTO Intervention (description, datedevis, immat) VALUES ( @description, @datedevis, @immat)";
+
             using (var cmd = dataSource.CreateCommand(query))
             {
                 cmd.Parameters.AddWithValue("@description", description);
-                cmd.Parameters.AddWithValue("@datedevis", datedevis);
+                if (rawdatedevis != null)
+                {
+                    cmd.Parameters.AddWithValue("@datedevis", DateOnly.Parse(rawdatedevis));
+                }
+
+
                 cmd.Parameters.AddWithValue("@immat", immat);
+
 
 
                 int result = cmd.ExecuteNonQuery();
