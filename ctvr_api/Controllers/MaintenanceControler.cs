@@ -254,7 +254,7 @@ namespace CTVR_API.Controllers
 
 
 
-            if (norep == null)
+            if (norep == null || norep == 0)
             {
                 return new JsonResult(2); // champ manquant
             }
