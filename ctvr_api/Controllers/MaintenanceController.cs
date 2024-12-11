@@ -56,8 +56,6 @@ namespace CTVR_API.Controllers
                             interventionFields.Add("noseq",
                                 reader.IsDBNull(8) ? null : reader.GetInt16(8)); // SMALLINT
 
-
-
                             // Gestion des champs DATE pouvant être NULL
                             interventionFields.Add("datedebutreparation",
                                 reader.IsDBNull(4) ? null : DateOnly.FromDateTime(reader.GetDateTime(4)));
@@ -143,8 +141,6 @@ namespace CTVR_API.Controllers
                 return new JsonResult(2); // champ manquant
             }
 
-
-
             string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
@@ -164,15 +160,12 @@ namespace CTVR_API.Controllers
                     cmd.Parameters.AddWithValue("@noseq", noseq);
                 }
 
-
                 using (var reader = cmd.ExecuteReader())
                 {
                     if (reader.Read())
                         return new JsonResult(4); // L'élément existe déjà
                 }
             }
-
-
 
             using (var cmd = dataSource.CreateCommand(query))
             {
@@ -182,10 +175,7 @@ namespace CTVR_API.Controllers
                     cmd.Parameters.AddWithValue("@datedevis", DateOnly.Parse(rawdatedevis));
                 }
 
-
                 cmd.Parameters.AddWithValue("@immat", immat);
-
-
 
                 int result = cmd.ExecuteNonQuery();
                 if (result == 0)
@@ -225,73 +215,13 @@ namespace CTVR_API.Controllers
             return new JsonResult(1);
         }
 
-
-        //vestige d'une civilisation utopique dans laquel utiliser l'api dans l'api fonctionne
-        /* [HttpPost]
-         public string getOneAtribute(Int16 norep, string atribute)
-         {
-             {
-                 string baseUrl = "http://localhost:5107/api/MaintenanceControler/GetInterventionById?";
-
-                 // Créer un client HTTP
-                 using (HttpClient client = new HttpClient())
-                 {
-                     try
-                     {
-                         // Construire l'URL de l'API
-                         string url = "http://localhost:5107/api/MaintenanceControler/GetInterventionById?identifiant=3";
-
-                         // Envoyer une requête GET à l'API et attendre le résultat
-                         HttpResponseMessage response = client.GetAsync(url).Result;
-
-                         if (response.IsSuccessStatusCode)
-                         {
-                             // Lire la réponse JSON et attendre le résultat
-                             string jsonResponse = response.Content.ReadAsStringAsync().Result;
-
-                             // Parser le JSON pour accéder aux valeurs
-                             var json = JObject.Parse(jsonResponse);
-                             string atrib = json[atribute]?.ToString();
-                             return atrib ?? "Attribut introuvable";
-                         }
-                         else
-                         {
-                             return "Erreur : API non accessible";
-                         }
-                     }
-                     catch (Exception ex)
-                     {
-                         return $"Une erreur est survenue : {ex.Message}";
-                     }
-                 }
-             }
-         }
-
-
-
-         [HttpPost]
-         public IActionResult test()
-         {
-             Console.WriteLine("test");
-             string result = getOneAtribute(3, "datedevis");
-             Console.WriteLine(result);
-
-             return Ok(result); // Renvoie le résultat comme réponse HTTP 200
-         }*/
-
         [HttpPost]
         public JsonResult updateIntervention(Int16 norep, int? annee, int? noseq, string? datedebutreparation, string? datefinreparation, string? entreegarage)
         {
-
-
-
-
             if (norep == null || norep == 0)
             {
                 return new JsonResult(2); // champ manquant
             }
-
-
 
             string constraintQuery = "SELECT * FROM Intervention WHERE norep=@norep";
             string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
@@ -300,7 +230,6 @@ namespace CTVR_API.Controllers
             using (var cmd = dataSource.CreateCommand(constraintQuery))
             {
                 cmd.Parameters.AddWithValue("@norep", norep);
-
 
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -325,7 +254,6 @@ namespace CTVR_API.Controllers
                         return new JsonResult(5); // Erreur d'insertion
                     }
                 }
-
             }
 
             if (datefinreparation != null)
@@ -362,9 +290,6 @@ namespace CTVR_API.Controllers
                 }
             }
 
-
-
-
             if (annee != null & noseq != null) // si un accident est lié
             {
                 string query = "update Intervention set noseq=@noseq, annee=@annee where norep=@norep ";
@@ -373,9 +298,6 @@ namespace CTVR_API.Controllers
                     cmd.Parameters.Add("@noseq", NpgsqlTypes.NpgsqlDbType.Integer).Value = noseq;
                     cmd.Parameters.Add("@annee", NpgsqlTypes.NpgsqlDbType.Integer).Value = annee;
                     cmd.Parameters.AddWithValue("@norep", norep);
-
-
-
 
                     int result = cmd.ExecuteNonQuery();
                     if (result == 0)
