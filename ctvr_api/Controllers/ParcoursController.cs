@@ -18,15 +18,36 @@ namespace CTVR_API.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAllInterventions(string? filtre)
+        public JsonResult GetAllParcours(string? filtre, string? nom, string? prenom, string? immat)
         {
             string query;
+
+
             switch (filtre)//date, debut rep, fin rep
             {
-                case "debutrep": query = "SELECT * FROM Intervention where datedebutreparation is not null and datefinreparation is null"; break;
-                case "finrep": query = "SELECT * FROM Intervention where datefinreparation is not null"; break;
-                case "dateasc": query = "SELECT * FROM Intervention order by datedevis asc;"; break;
-                case "datedesc": query = "SELECT * FROM Intervention order by datedevis desc;"; break;
+                case "chauffeur"://recherche par nom et prenom
+                    if (nom != null & prenom != null)
+                    {
+                        query = "SELECT nopermis, horaireservice, nom, prenom, noligne immat FROM Parcours join Conducteur using(nopermis) where nom = @nom and prenom = @prenom"; break;
+                    }
+                    else
+                    {
+                        return new JsonResult(2); // champ manquant
+
+                    }
+
+                case "immat":
+                    if (immat != null)
+                    {
+                        query = "SELECT nopermis, horaireservice, nom, prenom, noligne immat FROM Parcours join Conducteur using(nopermis) where immat = @immat"; break;
+                    }
+                    else
+                    {
+                        return new JsonResult(2); // champ manquant
+
+                    }
+                case "dateasc": query = "SELECT nopermis, horaireservice, nom, prenom, noligne immat FROM Parcours join Conducteur using(nopermis)order by nom asc;"; break;
+                case "datedesc": query = "SELECT nopermis, horaireservice, nom, prenom, noligne immat FROM Parcours join Conducteur using(nopermis) order by nom desc;"; break;
 
 
                 default:
