@@ -1,8 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
-using System.Text.Json;
-using Newtonsoft.Json.Linq; // Pour parser le JSON
 
 namespace CTVR_API.Controllers
 {
