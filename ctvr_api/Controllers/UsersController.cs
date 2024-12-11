@@ -179,9 +179,7 @@ namespace CTVR_API.Controllers
                 {
                     if (reader.Read())
                     {
-                        var result = new Dictionary<string, string>();
-                        result.Add("role", reader.GetString(4));
-                        return new JsonResult(result); // identifiant et mot de passe correspondants
+                        return new JsonResult(true); // identifiant et mot de passe correspondant
                     }
                 }
             }
