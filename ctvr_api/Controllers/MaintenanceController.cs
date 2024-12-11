@@ -31,7 +31,7 @@ namespace CTVR_API.Controllers
             }
 
             List<Intervention> interventions = new List<Intervention>();
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
             using (var connection = dataSource.OpenConnection())
             {
@@ -80,7 +80,7 @@ namespace CTVR_API.Controllers
             string query = "SELECT * FROM Intervention WHERE norep=@identifiant";
 
             Intervention? intervention = null;
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
@@ -139,7 +139,7 @@ namespace CTVR_API.Controllers
                 return new JsonResult(2); // champ manquant
             }
 
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
@@ -195,7 +195,7 @@ namespace CTVR_API.Controllers
 
             string query = "DELETE FROM Intervention WHERE norep=@norep";
 
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(query))
@@ -222,7 +222,7 @@ namespace CTVR_API.Controllers
             }
 
             string constraintQuery = "SELECT * FROM Intervention WHERE norep=@norep";
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
