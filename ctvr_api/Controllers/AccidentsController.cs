@@ -40,19 +40,19 @@ namespace CTVR_API.Controllers
 
                         if (!reader.IsDBNull(11))
                         {
-                            accidentFields.Add("etatdossieraccident", EtatsAccident.Cloturer);
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Cloturer.ToString());
                         }
                         else if (!reader.IsDBNull(10))
                         {
-                            accidentFields.Add("etatdossieraccident", EtatsAccident.Valide);
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Valide.ToString());
                         }
                         else if (!reader.IsDBNull(9))
                         {
-                            accidentFields.Add("etatdossieraccident", EtatsAccident.Transmit);
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Transmit.ToString());
                         }
                         else
                         {
-                            accidentFields.Add("etatdossieraccident", EtatsAccident.Ouvert);
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Ouvert.ToString());
                         }
                         accidents.Add(accidentFields);
                     }
