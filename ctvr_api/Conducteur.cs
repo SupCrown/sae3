@@ -5,31 +5,34 @@ namespace CTVR_API
 {
     public class Conducteur
     {
-        public string nopermis { get; set; }
-        public DateOnly datepermis { get; set; }
+        public string? nopermis { get; set; }
+        public DateOnly? datepermis { get; set; }
         public string? lieudelivrancepermis { get; set; }
-        public DateOnly dateprisefonction { get; set; }
-        public string nom { get; set; }
-        public string prenom { get; set; }
-        public DateOnly datenaissance { get; set; }
+        public DateOnly? dateprisefonction { get; set; }
+        public string? nom { get; set; }
+        public string? prenom { get; set; }
+        public DateOnly? datenaissance { get; set; }
         public string? adresse { get; set; }
         public string? codepostal { get; set; }
         public string? ville { get; set; }
 
 
-        public Conducteur(Dictionary<string, object> fields)
+        public Conducteur(Dictionary<string?, object> fields)
         {
-            nopermis = fields.ContainsKey("nopermis") ? (string)fields["nopermis"] : null;
+            nopermis = fields.ContainsKey("nopermis") ? (string?)fields["nopermis"] : null;
 
-            nom = fields.ContainsKey("nom") ? (string)fields["nom"] : null;
+            nom = fields.ContainsKey("nom") ? (string?)fields["nom"] : null;
 
-            prenom = fields.ContainsKey("prenom") ? (string)fields["prenom"] : null;
+            prenom = fields.ContainsKey("prenom") ? (string?)fields["prenom"] : null;
 
-            datenaissance = fields.ContainsKey("datenaissance") ? (DateOnly)fields["datenaissance"] : null;
+            dateprisefonction = fields.ContainsKey("dateprisefonction") && fields["dateprisefonction"] != DBNull.Value
+                ? (DateOnly?)fields["dateprisefonction"]
+                : null;
 
-            dateprisefonction = fields.ContainsKey("dateprisefonction") ? (DateOnly)fields["dateprisefonction"] : null;
-
-            datepermis = fields.ContainsKey("datepermis") ? (DateOnly)fields["datepermis"] : null;
+            datenaissance = fields.ContainsKey("datenaissance") && fields["datenaissance"] != DBNull.Value
+                ? (DateOnly?)fields["datenaissance"]
+                : null;
+            datepermis = fields.ContainsKey("datepermis") ? (DateOnly?)fields["datepermis"] : null;
 
             codepostal = fields.ContainsKey("codepostal") && fields["codepostal"] != DBNull.Value
                 ? (string?)fields["codepostal"]

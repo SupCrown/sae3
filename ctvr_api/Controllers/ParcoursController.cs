@@ -17,71 +17,86 @@ namespace CTVR_API.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAllParcours(string? filtre, string? nom, string? prenom, string? immat)
-        {
-            string query;
+       public JsonResult GetAllParcours(string? filtre, string? nom, string? prenom, string? immat)
+{
+    string query;
 
-
-            switch (filtre)//date, debut rep, fin rep
+    switch (filtre)
+    {
+        case "chauffeur":
+            if (nom != null && prenom != null)
             {
-                case "chauffeur"://recherche par nom et prenom
-                    if (nom != null & prenom != null)
-                    {
-                        query = "SELECT nopermis, horaireservice, nom, prenom, noligne immat FROM Parcours join Conducteur using(nopermis) where nom = @nom and prenom = @prenom"; break;
-                    }
-                    else
-                    {
-                        return new JsonResult(2); // champ manquant
-
-                    }
-
-                case "immat":
-                    if (immat != null)
-                    {
-                        query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) where immat = @immat"; break;
-                    }
-                    else
-                    {
-                        return new JsonResult(2); // champ manquant
-
-                    }
-                case "asc": query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis)order by nom asc;"; break;
-                case "desc": query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) order by nom desc;"; break;
-
-
-                default:
-                    query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis)";
-                    break;
+                query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) where nom = @nom and prenom = @prenom";
+                break;
+            }
+            else
+            {
+                return new JsonResult(2); // Champ manquant
             }
 
-            List<Parcours> Parcours = new List<Parcours>();
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
-            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
-            using (var connection = dataSource.OpenConnection())
+        case "immat":
+            if (immat != null)
             {
+                query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) where immat = @immat";
+                break;
+            }
+            else
+            {
+                return new JsonResult(2); // Champ manquant
+            }
 
-                using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
+        case "asc":
+            query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) order by nom asc";
+            break;
+
+        case "desc":
+            query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) order by nom desc";
+            break;
+
+        default:
+            query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis)";
+            break;
+    }
+
+    List<Parcours> Parco = new List<Parcours>();
+    string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+    NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+    using (var connection = dataSource.OpenConnection())
+    {
+        using (var cmd = dataSource.CreateCommand(query))
+        {
+            if (filtre == "chauffeur")
+            {
+                cmd.Parameters.AddWithValue("@nom", nom);
+                cmd.Parameters.AddWithValue("@prenom", prenom);
+            }
+            else if (filtre == "immat")
+            {
+                cmd.Parameters.AddWithValue("@immat", immat);
+            }
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
                 {
-                    using (var reader = cmd.ExecuteReader()) // exécute la commande et renvoie un reader qui peut parcourir le resultat
+                    Dictionary<string, object> ParcoursFields = new Dictionary<string, object>
                     {
-                        while (reader.Read()) // pour chacune des lignes renvoyées
-                        {
-                            Dictionary<string, object> ParcoursFields = new Dictionary<string, object>();
-                            ParcoursFields.Add("nopermis", reader.GetString(0)); // TEXT
-                            ParcoursFields.Add("horaireservice",reader.GetTimeSpan(1));//TIMESTAMP
-                            ParcoursFields.Add("nom", reader.GetString(2)); // TEXT
-                            ParcoursFields.Add("prenom", reader.GetString(3)); // TEXT
-                            ParcoursFields.Add("noligne", reader.GetInt16(4));//INTERGER
-                            ParcoursFields.Add("immat", reader.GetString(5)); // TEXT
-                            var Parcours = new Parcours(ParcoursFields);
-                            Parcourss.Add(Parcours);
-                        }
-                    }
+                        { "nopermis", reader.GetString(0) },      // TEXT
+                        { "horaireservice", reader.GetDateTime(1) }, // TIMESTAMP
+                        { "nom", reader.GetString(2) },          // TEXT
+                        { "prenom", reader.GetString(3) },       // TEXT
+                        { "noligne", reader.GetInt16(4) },       // INTEGER
+                        { "immat", reader.GetString(5) }         // TEXT
+                    };
+                    Parco.Add(new Parcours(ParcoursFields));
                 }
-                return new JsonResult(Parcourss);
             }
         }
+    }
 
+    return new JsonResult(Parco);
+}
 
         [HttpPost]
         public JsonResult GetParcoursById(Int16? identifiant)
@@ -94,7 +109,7 @@ namespace CTVR_API.Controllers
             string query = "SELECT * FROM Parcours WHERE norep=@identifiant";
 
             Parcours? Parcours = null;
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
@@ -138,7 +153,7 @@ namespace CTVR_API.Controllers
 
 
             string constraintQuery = "SELECT * FROM Parcours WHERE datedevis = @datedevis and description = @description and immat = @immat and annee=@annee and noseq=@noseq";
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
@@ -185,7 +200,7 @@ namespace CTVR_API.Controllers
 
             string query = "DELETE FROM Parcours WHERE norep=@norep";
 
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(query))
@@ -272,7 +287,7 @@ namespace CTVR_API.Controllers
 
 
             string constraintQuery = "SELECT * FROM Parcours WHERE norep=@norep";
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
