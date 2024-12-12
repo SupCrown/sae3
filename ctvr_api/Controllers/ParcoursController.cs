@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Text.Json;
-using Newtonsoft.Json.Linq; // Pour parser le JSON
 
 namespace CTVR_API.Controllers
 {
@@ -39,23 +38,23 @@ namespace CTVR_API.Controllers
                 case "immat":
                     if (immat != null)
                     {
-                        query = "SELECT nopermis, horaireservice, nom, prenom, noligne immat FROM Parcours join Conducteur using(nopermis) where immat = @immat"; break;
+                        query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) where immat = @immat"; break;
                     }
                     else
                     {
                         return new JsonResult(2); // champ manquant
 
                     }
-                case "dateasc": query = "SELECT nopermis, horaireservice, nom, prenom, noligne immat FROM Parcours join Conducteur using(nopermis)order by nom asc;"; break;
-                case "datedesc": query = "SELECT nopermis, horaireservice, nom, prenom, noligne immat FROM Parcours join Conducteur using(nopermis) order by nom desc;"; break;
+                case "asc": query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis)order by nom asc;"; break;
+                case "desc": query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) order by nom desc;"; break;
 
 
                 default:
-                    query = "SELECT * FROM Intervention order by datedevis";
+                    query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis)";
                     break;
             }
 
-            List<Intervention> interventions = new List<Intervention>();
+            List<Parcours> Parcours = new List<Parcours>();
             string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
             using (var connection = dataSource.OpenConnection())
@@ -67,44 +66,34 @@ namespace CTVR_API.Controllers
                     {
                         while (reader.Read()) // pour chacune des lignes renvoyées
                         {
-                            Dictionary<string, object> interventionFields = new Dictionary<string, object>();
-                            interventionFields.Add("norep", reader.GetInt16(0)); // SMALLINT
-                            interventionFields.Add("dateentreebus",
-                                reader.IsDBNull(1) ? null : reader.GetDateTime(1));
-                            interventionFields.Add("description", reader.GetString(2)); // TEXT
-                            interventionFields.Add("datedevis", reader.GetDateTime(3)); // DATE (NOT NULL)
-                            interventionFields.Add("immat", reader.GetString(6)); // TEXT
-                            interventionFields.Add("annee", reader.GetInt16(0));
-                            interventionFields.Add("noseq", reader.GetInt16(8)); // SMALLINT
-
-
-
-                            // Gestion des champs DATE pouvant être NULL
-                            interventionFields.Add("datedebutreparation",
-                                reader.IsDBNull(4) ? null : reader.GetDateTime(4));
-                            interventionFields.Add("datefinreparation",
-                                reader.IsDBNull(5) ? null : reader.GetDateTime(5));
-                            var intervention = new Intervention(interventionFields);
-                            interventions.Add(intervention);
+                            Dictionary<string, object> ParcoursFields = new Dictionary<string, object>();
+                            ParcoursFields.Add("nopermis", reader.GetString(0)); // TEXT
+                            ParcoursFields.Add("horaireservice",reader.GetTimeSpan(1));//TIMESTAMP
+                            ParcoursFields.Add("nom", reader.GetString(2)); // TEXT
+                            ParcoursFields.Add("prenom", reader.GetString(3)); // TEXT
+                            ParcoursFields.Add("noligne", reader.GetInt16(4));//INTERGER
+                            ParcoursFields.Add("immat", reader.GetString(5)); // TEXT
+                            var Parcours = new Parcours(ParcoursFields);
+                            Parcourss.Add(Parcours);
                         }
                     }
                 }
-                return new JsonResult(interventions);
+                return new JsonResult(Parcourss);
             }
         }
 
 
         [HttpPost]
-        public JsonResult GetInterventionById(Int16? identifiant)
+        public JsonResult GetParcoursById(Int16? identifiant)
         {
             if (identifiant == null)
             {
                 return new JsonResult(2); // champ manquant
             }
 
-            string query = "SELECT * FROM Intervention WHERE norep=@identifiant";
+            string query = "SELECT * FROM Parcours WHERE norep=@identifiant";
 
-            Intervention? intervention = null;
+            Parcours? Parcours = null;
             string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
@@ -117,18 +106,18 @@ namespace CTVR_API.Controllers
                     if (reader.Read()) // ssi on a un retour
                     {
 
-                        Dictionary<string, object> interventionFields = new Dictionary<string, object>();
-                        interventionFields.Add("norep", reader.GetInt16(0)); // Si c'est un smallint
-                        interventionFields.Add("dateentreebus", reader.GetDateTime(1));
-                        interventionFields.Add("description", reader.GetString(2));
-                        interventionFields.Add("datedevis", reader.GetDateTime(3));
-                        interventionFields.Add("datefinreparation", reader.GetDateTime(4));
-                        interventionFields.Add("datedebutreparation", reader.GetDateTime(5));
-                        interventionFields.Add("immat", reader.GetString(6));
-                        interventionFields.Add("annee", reader.GetInt16(0));
-                        interventionFields.Add("noseq", reader.GetInt16(0));
-                        intervention = new Intervention(interventionFields);
-                        return new JsonResult(intervention);
+                        Dictionary<string, object> ParcoursFields = new Dictionary<string, object>();
+                        ParcoursFields.Add("norep", reader.GetInt16(0)); // Si c'est un smallint
+                        ParcoursFields.Add("dateentreebus", reader.GetDateTime(1));
+                        ParcoursFields.Add("description", reader.GetString(2));
+                        ParcoursFields.Add("datedevis", reader.GetDateTime(3));
+                        ParcoursFields.Add("datefinreparation", reader.GetDateTime(4));
+                        ParcoursFields.Add("datedebutreparation", reader.GetDateTime(5));
+                        ParcoursFields.Add("immat", reader.GetString(6));
+                        ParcoursFields.Add("annee", reader.GetInt16(0));
+                        ParcoursFields.Add("noseq", reader.GetInt16(0));
+                        Parcours = new Parcours(ParcoursFields);
+                        return new JsonResult(Parcours);
 
                     }
                 }
@@ -137,7 +126,7 @@ namespace CTVR_API.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddIntervention(string rawdatedevis, string description, string immat, Int16? annee, Int16? noseq)
+        public JsonResult AddParcours(string rawdatedevis, string description, string immat, Int16? annee, Int16? noseq)
         {
 
             DateTime datedevis = DateTime.Parse(rawdatedevis);
@@ -148,7 +137,7 @@ namespace CTVR_API.Controllers
 
 
 
-            string constraintQuery = "SELECT * FROM Intervention WHERE datedevis = @datedevis and description = @description and immat = @immat and annee=@annee and noseq=@noseq";
+            string constraintQuery = "SELECT * FROM Parcours WHERE datedevis = @datedevis and description = @description and immat = @immat and annee=@annee and noseq=@noseq";
             string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
@@ -168,7 +157,7 @@ namespace CTVR_API.Controllers
             }
 
 
-            string query = "INSERT INTO Intervention (description, datedevis, immat) VALUES ( @description, @datedevis, @immat)";
+            string query = "INSERT INTO Parcours (description, datedevis, immat) VALUES ( @description, @datedevis, @immat)";
             using (var cmd = dataSource.CreateCommand(query))
             {
                 cmd.Parameters.AddWithValue("@description", description);
@@ -187,14 +176,14 @@ namespace CTVR_API.Controllers
         }
 
         [HttpDelete]
-        public JsonResult DeleteIntervention(Int16? norep)
+        public JsonResult DeleteParcours(Int16? norep)
         {
             if (norep == null)
             {
                 return new JsonResult(2); // champ manquant
             }
 
-            string query = "DELETE FROM Intervention WHERE norep=@norep";
+            string query = "DELETE FROM Parcours WHERE norep=@norep";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
@@ -220,7 +209,7 @@ namespace CTVR_API.Controllers
          public string getOneAtribute(Int16 norep, string atribute)
          {
              {
-                 string baseUrl = "http://localhost:5107/api/ParcoursController/GetInterventionById?";
+                 string baseUrl = "http://localhost:5107/api/ParcoursController/GetParcoursById?";
 
                  // Créer un client HTTP
                  using (HttpClient client = new HttpClient())
@@ -228,7 +217,7 @@ namespace CTVR_API.Controllers
                      try
                      {
                          // Construire l'URL de l'API
-                         string url = "http://localhost:5107/api/ParcoursController/GetInterventionById?identifiant=3";
+                         string url = "http://localhost:5107/api/ParcoursController/GetParcoursById?identifiant=3";
 
                          // Envoyer une requête GET à l'API et attendre le résultat
                          HttpResponseMessage response = client.GetAsync(url).Result;
@@ -269,7 +258,7 @@ namespace CTVR_API.Controllers
          }*/
 
         [HttpPost]
-        public JsonResult updateIntervention(Int16 norep, int? annee, int? noseq, string? datedebutreparation, string? datefinreparation, string? entreegarage)
+        public JsonResult updateParcours(Int16 norep, int? annee, int? noseq, string? datedebutreparation, string? datefinreparation, string? entreegarage)
         {
 
 
@@ -282,7 +271,7 @@ namespace CTVR_API.Controllers
 
 
 
-            string constraintQuery = "SELECT * FROM Intervention WHERE norep=@norep";
+            string constraintQuery = "SELECT * FROM Parcours WHERE norep=@norep";
             string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
@@ -302,7 +291,7 @@ namespace CTVR_API.Controllers
             {
                 DateTime debutrep = DateTime.Parse(datedebutreparation);
 
-                string query = "update Intervention set datedebutreparation = @debutrep WHERE norep=@norep ";
+                string query = "update Parcours set datedebutreparation = @debutrep WHERE norep=@norep ";
                 using (var cmd = dataSource.CreateCommand(query))
                 {
                     cmd.Parameters.AddWithValue("@debutrep", debutrep);
@@ -320,7 +309,7 @@ namespace CTVR_API.Controllers
             if (datefinreparation != null)
             {
                 DateTime finrep = DateTime.Parse(datefinreparation);
-                string query = "update Intervention set datefinreparation = @finrep WHERE norep = @norep ";
+                string query = "update Parcours set datefinreparation = @finrep WHERE norep = @norep ";
                 using (var cmd = dataSource.CreateCommand(query))
                 {
                     cmd.Parameters.AddWithValue("@finrep", finrep);
@@ -337,7 +326,7 @@ namespace CTVR_API.Controllers
             if (entreegarage != null)
             {
                 DateTime dateentreegarage = DateTime.Parse(entreegarage);
-                string query = "update Intervention set dateentreebus = @dateentreegarage WHERE norep=@norep ";
+                string query = "update Parcours set dateentreebus = @dateentreegarage WHERE norep=@norep ";
                 using (var cmd = dataSource.CreateCommand(query))
                 {
                     cmd.Parameters.AddWithValue("@dateentreegarage", dateentreegarage);
@@ -356,7 +345,7 @@ namespace CTVR_API.Controllers
 
             if (annee != null & noseq != null) // si un accident est lié
             {
-                string query = "update Intervention set noseq=@noseq, annee=@annee where norep=@norep ";
+                string query = "update Parcours set noseq=@noseq, annee=@annee where norep=@norep ";
                 using (var cmd = dataSource.CreateCommand(query))
                 {
                     cmd.Parameters.Add("@noseq", NpgsqlTypes.NpgsqlDbType.Integer).Value = noseq;

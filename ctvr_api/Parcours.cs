@@ -14,7 +14,7 @@ namespace CTVR_API
 
     public class Parcours
     {
-        public Int16 nopermis { get; set; }
+        public string nopermis { get; set; }
         public TimeSpan horaireservice { get; set; }
         public string immat { get; set; }
         public string nomchauffeur { get; set; }
@@ -22,9 +22,9 @@ namespace CTVR_API
         public Int16 noligne { get; set; }
 
 
-        public Intervention(Dictionary<string, object> fields)
+        public Parcours(Dictionary<string, object> fields)
         {
-            nopermis = fields.ContainsKey("nopermis") ? (Int16)fields["nopermis"] : null;
+            nopermis = fields.ContainsKey("nopermis") ? (string)fields["nopermis"] : null;
 
             horaireservice = fields.ContainsKey("horaireservice") ? (TimeSpan)fields["horaireservice"] : null;
 

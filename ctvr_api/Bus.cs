@@ -11,13 +11,13 @@ namespace CTVR_API
 
 
 
-        public Intervention(Dictionary<string, object> fields)
+        public Bus(Dictionary<string, object> fields)
         {
             immat = fields.ContainsKey("immat") ? (string)fields["immat"] : null;
 
             miseenservice = fields.ContainsKey("miseenservice") && fields["miseenservice"] != DBNull.Value
                 ? (DateOnly?)fields["miseenservice"]
-                : string.Empty;
+                : null;
 
         }
     }

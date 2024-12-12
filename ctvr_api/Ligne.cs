@@ -15,11 +15,11 @@ namespace CTVR_API
 
 
 
-        public Intervention(Dictionary<string, object> fields)
+        public Ligne(Dictionary<string, object> fields)
         {
             noligne = fields.ContainsKey("noligne") && fields["noligne"] != DBNull.Value
                 ? (Int16?)fields["noligne"]
-                : string.Empty;
+                : null;
 
             nomarretdepart = fields.ContainsKey("nomarretdepart") && fields["nomarretdepart"] != DBNull.Value
                 ? (string?)fields["nomarretdepart"]

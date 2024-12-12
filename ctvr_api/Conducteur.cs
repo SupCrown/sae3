@@ -5,7 +5,7 @@ namespace CTVR_API
 {
     public class Conducteur
     {
-        public Int16 nopermis { get; set; }
+        public string nopermis { get; set; }
         public DateOnly datepermis { get; set; }
         public string? lieudelivrancepermis { get; set; }
         public DateOnly dateprisefonction { get; set; }
@@ -17,9 +17,9 @@ namespace CTVR_API
         public string? ville { get; set; }
 
 
-        public Intervention(Dictionary<string, object> fields)
+        public Conducteur(Dictionary<string, object> fields)
         {
-            nopermis = fields.ContainsKey("nopermis") ? (Int16)fields["nopermis"] : null;
+            nopermis = fields.ContainsKey("nopermis") ? (string)fields["nopermis"] : null;
 
             nom = fields.ContainsKey("nom") ? (string)fields["nom"] : null;
 
