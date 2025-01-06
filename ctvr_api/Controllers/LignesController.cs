@@ -126,7 +126,7 @@ namespace CTVR_API.Controllers
                 return new JsonResult(2); // champ manquant
             }
 
-            string query = "DELETE FROM lignes WHERE noligne=@noligne";
+            string query = "DELETE FROM ligne WHERE noligne=@noligne";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
@@ -146,7 +146,7 @@ namespace CTVR_API.Controllers
             return new JsonResult(1);
         }
 
-                [HttpPost]
+        [HttpPost]
         public JsonResult updateIntervention(Int16? noligne, string? nomarretdepart, string? nomarretterminus)
         {
 
@@ -157,7 +157,7 @@ namespace CTVR_API.Controllers
 
 
             string constraintQuery = "SELECT * FROM ligne WHERE noligne=@noligne";
-            string connectionString = _configuration.GetConnectionString("ctvrtestDBConn");
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
