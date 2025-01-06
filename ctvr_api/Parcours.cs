@@ -7,7 +7,7 @@ namespace CTVR_API
     public class Parcours
     {
         public string nopermis { get; set; }
-        public TimeSpan? horaireservice { get; set; }
+        public DateTime? horaireservice { get; set; }
         public string immat { get; set; }
         public string nomchauffeur { get; set; }
         public string prenomchauffeur { get; set; }
@@ -18,7 +18,7 @@ namespace CTVR_API
         {
             nopermis = fields.ContainsKey("nopermis") ? (string)fields["nopermis"] : null;
 
-            horaireservice = fields.ContainsKey("horaireservice") ? (TimeSpan?)fields["horaireservice"] : null;
+            horaireservice = fields.ContainsKey("horaireservice") ? (DateTime?)fields["horaireservice"] : null;
 
             immat = fields.ContainsKey("immat") ? (string)fields["immat"] : null;
 
