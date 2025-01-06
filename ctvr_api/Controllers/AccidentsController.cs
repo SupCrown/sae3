@@ -97,7 +97,7 @@ namespace CTVR_API.Controllers
                         accidentFields.Add("datevalidationassur", reader.IsDBNull(10) ? null : DateOnly.FromDateTime(reader.GetDateTime(10)));
                         accidentFields.Add("datecloturedossier", reader.IsDBNull(11) ? null : DateOnly.FromDateTime(reader.GetDateTime(11)));
                         accidentFields.Add("sommerecue", reader.IsDBNull(12) ? null : reader.GetInt32(12));
-                        accidentFields.Add("intemperie", ItemperieMethodes.parseItemp(reader.GetString(13)));
+                        accidentFields.Add("intemperie", reader.GetString(13));
                     }
                 }
             }
@@ -132,15 +132,14 @@ namespace CTVR_API.Controllers
                         
                         Tiers tiers = new Tiers(tiersFields);
                         
-                        impliquerFields.Add("tiers", tiers);
+                        impliquerFields.Add("tiers", new List<Tiers> { tiers });
 
                         impliquers.Add(new Impliquer(impliquerFields));
                     }
                 }
             }
-            Accident accident = new Accident(accidentFields);
-            accident.impliquers = impliquers;
-            return new JsonResult(accident);
+            accidentFields.Add("impliquers", impliquers);
+            return new JsonResult(new List<Object> { accidentFields });
         }
 
         [HttpPut]
