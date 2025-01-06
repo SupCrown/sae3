@@ -62,7 +62,7 @@ namespace CTVR_API.Controllers
                     Dictionary<string, Object> LigneFields = new Dictionary<string, Object>();
                     if (reader.Read()) // ssi on a un retour
                     {
-                        LigneFields.Add("noligne", reader.GetString(0));
+                        LigneFields.Add("noligne", reader.GetInt16(0));
                         LigneFields.Add("nomarretdepart", reader.GetString(1));
                         LigneFields.Add("nomarretterminus", reader.GetString(2));
                         ligne = new Ligne(LigneFields);
