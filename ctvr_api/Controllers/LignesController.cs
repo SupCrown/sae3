@@ -30,7 +30,7 @@ namespace CTVR_API.Controllers
                     while (reader.Read()) // pour chacune des Ligne renvoyées
                     {
                         Dictionary<string, object> LigneFields = new Dictionary<string, object>();
-                        LigneFields.Add("noligne", reader.GetInt(0));
+                        LigneFields.Add("noligne", reader.GetInt16(0));
                         LigneFields.Add("nomarretdepart", reader.GetString(1));
                         LigneFields.Add("nomarretterminus", reader.GetString(2));
                         Lignes.Add(new Ligne(LigneFields));
@@ -38,13 +38,13 @@ namespace CTVR_API.Controllers
                 }
             }
 
-            return new JsonResult(Ligne);
+            return new JsonResult(Lignes);
         }
 
         [HttpPost]
-        public JsonResult GetLigneById(Int16? noLigne)
+        public JsonResult GetLigneById(Int16? noligne)
         {
-            if (string.IsNullOrWhiteSpace(noligne))
+            if (noligne == null)
             {
                 return new JsonResult(2); // champ manquant
             }
@@ -59,14 +59,14 @@ namespace CTVR_API.Controllers
 
                 using (var reader = cmd.ExecuteReader())
                 {
-                    Dictionary<string, string> LigneFields = new Dictionary<string, string>();
+                    Dictionary<string, Object> LigneFields = new Dictionary<string, Object>();
                     if (reader.Read()) // ssi on a un retour
                     {
                         LigneFields.Add("noligne", reader.GetString(0));
                         LigneFields.Add("nomarretdepart", reader.GetString(1));
                         LigneFields.Add("nomarretterminus", reader.GetString(2));
-                        Ligne = new Ligne(LigneFields);
-                        return new JsonResult(Ligne);
+                        ligne = new Ligne(LigneFields);
+                        return new JsonResult(ligne);
                     }
                 }
             }
@@ -74,7 +74,7 @@ namespace CTVR_API.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddLigne(Int16? noLigne, string? nomarretdepart, string? nomarretterminus)
+        public JsonResult AddLigne(Int16? noligne, string? nomarretdepart, string? nomarretterminus)
         {
             if (noligne == null
                 || string.IsNullOrWhiteSpace(nomarretdepart) 
@@ -119,9 +119,9 @@ namespace CTVR_API.Controllers
         }
 
         [HttpDelete]
-        public JsonResult DeleteLigne(Int16? noLigne)
+        public JsonResult DeleteLigne(Int16? noligne)
         {
-            if (string.IsNullOrWhiteSpace(noligne))
+            if (noligne == null)
             {
                 return new JsonResult(2); // champ manquant
             }
