@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+/*using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 
 namespace CTVR_API.Controllers
@@ -211,4 +211,4 @@ namespace CTVR_API.Controllers
     }
 
     
-}
+}*/
