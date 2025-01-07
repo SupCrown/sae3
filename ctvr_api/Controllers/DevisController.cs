@@ -346,146 +346,105 @@ namespace CTVR_API.Controllers
 
             return new JsonResult(1);
         }
-        /*
-                    [HttpPost]
-                    public JsonResult GetdevisById(Int16? nodevis)
+
+
+
+        [HttpPost]
+        public JsonResult AddDevis(Int16 norep, Dictionary<string, int> dicPiece, Dictionary<string, int> dicMoe, double taux, double pUnit)
+        {
+
+            // Vérification de la présence de l'devis à entrer dans la base
+            string constraintQuery = "SELECT * FROM necessiter where norep=@norep";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(constraintQuery))
+            {
+                cmd.Parameters.AddWithValue("@norep", norep);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read()) return new JsonResult(4); // l'élément existe déjà
+                }
+            }
+
+            string queryNec = "INSERT INTO necessiter(norep, codeM, NbHDevis, @auxHoraire) VALUES (@norep, @codeM, @NbHDevis, @TauxHoraire)";
+            string queryUti = "INSERT INTO devis(norep, codeF, QteDevis, PrixUnitaire) VALUES (@norep, @codeF, @QteDevis, @PrixUnitaire)";
+            string queryInter = "UPDATE Intervention SET DateDevis = @dateDevis WHERE norep = @norep";
+            string query = "";
+
+            using (var cmd = dataSource.CreateCommand(queryNec))
+            {
+                foreach (var item in dicMoe)
+                {
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("@norep", norep);
+                    cmd.Parameters.AddWithValue("@codeM", item.Key);
+                    cmd.Parameters.AddWithValue("@NbHDevis", item.Value);
+
+                    query = "select tauxHoraireCourant from moe where codeM = @codeM";
+                    using (var cmdTaux = dataSource.CreateCommand(Query))
                     {
-                        if (nodevis == null)
+                        cmdTaux.Parameters.AddWithValue("@codeM", item.Key);
+                        using (var readerTaux = cmdTaux.ExecuteReader())
                         {
-                            return new JsonResult(2); // champ manquant
-                        }
-                        devis devis = null;
-                        string query = "SELECT * FROM devis WHERE nodevis=@nodevis";
-                        string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
-                        NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
-
-                        using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
-                        {
-                            cmd.Parameters.AddWithValue("@nodevis", nodevis); // ajout du paramètre
-
-                            using (var reader = cmd.ExecuteReader())
+                            if (reader.Read())
                             {
-                                Dictionary<string, Object> devisFields = new Dictionary<string, Object>();
-                                if (reader.Read()) // ssi on a un retour
-                                {
-                                    devisFields.Add("nodevis", reader.GetInt16(0));
-                                    devisFields.Add("nomarretdepart", reader.GetString(1));
-                                    devisFields.Add("nomarretterminus", reader.GetString(2));
-                                    devis = new devis(devisFields);
-                                    return new JsonResult(devis);
-                                }
+                                cmd.Parameters.AddWithValue("@TauxHoraire", item.Key);
                             }
                         }
-                        return new JsonResult(3); // l'élément n'existe pas
+                    }
+                    try
+                    {
+                        
+                    }
+                    catch (System.Exception)
+                    {
+                        
+                        throw;
                     }
 
-                    [HttpPost]
-                    public JsonResult Adddevis(Int16? nodevis, string? nomarretdepart, string? nomarretterminus)
-                    {
-                        if (nodevis == null
-                            || string.IsNullOrWhiteSpace(nomarretdepart)
-                            || string.IsNullOrWhiteSpace(nomarretterminus)
-                            )
-                        {
-                            return new JsonResult(2); // champ manquant
-                        }
-
-                        // Vérification de la présence de l'devis à entrer dans la base
-                        string constraintQuery = "SELECT * FROM devis where nodevis=@nodevis";
-
-                        string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
-                        NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
-
-                        using (var cmd = dataSource.CreateCommand(constraintQuery))
-                        {
-                            cmd.Parameters.AddWithValue("@nodevis", nodevis);
-                            using (var reader = cmd.ExecuteReader())
-                            {
-                                if (reader.Read()) return new JsonResult(4); // l'élément existe déjà
-                            }
-                        }
-
-                        string query = "INSERT INTO devis VALUES (@nodevis, @nomarretdepart, @nomarretterminus)";
-
-                        using (var cmd = dataSource.CreateCommand(query))
-                        {
-                            cmd.Parameters.AddWithValue("@nodevis", nodevis);
-                            cmd.Parameters.AddWithValue("@nomarretdepart", nomarretdepart);
-                            cmd.Parameters.AddWithValue("@nomarretterminus", nomarretterminus);
-
-                            int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de devis affectées -> 1 si tout se passe bien
-
-                            if (result == 0) // si ca n'a pas fonctionné
-                            {
-                                return new JsonResult(5);
-                            }
-                        }
-
-                        return new JsonResult(1); // fonctionnement correcte
-                    }
+                    int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de devis affectées -> 1 si tout se passe bien
+                }
 
 
-                    [HttpPost]
-                    public JsonResult updateIntervention(Int16? nodevis, string? nomarretdepart, string? nomarretterminus)
-                    {
+                if (result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(5);
+                }
+            }
 
-                        if (nodevis == null || nodevis == 0)
-                        {
-                            return new JsonResult(2); // champ manquant
-                        }
+            using (var cmd = dataSource.CreateCommand(queryUti))
+            {
+                cmd.Parameters.AddWithValue("@nodevis", nodevis);
+                cmd.Parameters.AddWithValue("@nomarretdepart", nomarretdepart);
+                cmd.Parameters.AddWithValue("@nomarretterminus", nomarretterminus);
 
+                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de devis affectées -> 1 si tout se passe bien
 
-                        string constraintQuery = "SELECT * FROM devis WHERE nodevis=@nodevis";
-                        string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
-                        NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+                if (result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(5);
+                }
+            }
 
-                        using (var cmd = dataSource.CreateCommand(constraintQuery))
-                        {
-                            cmd.Parameters.AddWithValue("@nodevis", nodevis);
+            using (var cmd = dataSource.CreateCommand(queryInter))
+            {
+                cmd.Parameters.AddWithValue("@nodevis", nodevis);
+                cmd.Parameters.AddWithValue("@nomarretdepart", nomarretdepart);
+                cmd.Parameters.AddWithValue("@nomarretterminus", nomarretterminus);
 
+                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de devis affectées -> 1 si tout se passe bien
 
-                            using (var reader = cmd.ExecuteReader())
-                            {
-                                if (!reader.Read())
-                                    return new JsonResult(3); // L'élément n'existe pas mais devrait
-                            }
-                        }
-
-                        if (nomarretdepart != null)
-                        {
-                            string query = "update devis set nomarretdepart = @nomarretdepart WHERE nodevis = @nodevis ";
-                            using (var cmd = dataSource.CreateCommand(query))
-                            {
-                                cmd.Parameters.AddWithValue("@nodevis", nodevis);
-                                cmd.Parameters.AddWithValue("@nomarretdepart", nomarretdepart);
-
-                                int result = cmd.ExecuteNonQuery();
-                                if (result == 0)
-                                {
-                                    return new JsonResult(5); // Erreur d'insertion
-                                }
-                            }
-                        }
-
-                        if (nomarretterminus != null)
-                        {
-                            string query = "update devis set nomarretterminus = @nomarretterminus WHERE nodevis=@nodevis ";
-                            using (var cmd = dataSource.CreateCommand(query))
-                            {
-                                cmd.Parameters.AddWithValue("@nodevis", nodevis);
-                                cmd.Parameters.AddWithValue("@nomarretterminus", nomarretterminus);
-
-                                int result = cmd.ExecuteNonQuery();
-                                if (result == 0)
-                                {
-                                    return new JsonResult(5); // Erreur d'insertion
-                                }
-                            }
-                        }
+                if (result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(5);
+                }
+            }
 
 
-                        return new JsonResult(1); // Ajout réussi
-                    }*/
+            return new JsonResult(1); // fonctionnement correcte
+        }
 
     }
 
