@@ -108,11 +108,9 @@ namespace CTVR_API.Controllers
                 return new JsonResult(2); // champ manquant
             }
 
-            string constraintQuery = "SELECT * FROM conducteur WHERE nopermis = @nopermis";
+            string constraintQuery = "SELECT * FROM Parcours WHERE nopermis = @nopermis and horaireservice = @horaireservice";
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
-
-            constraintQuery = "SELECT * FROM Parcours WHERE nopermis = @nopermis and horaireservice = @horaireservice";
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
             {
@@ -142,11 +140,9 @@ namespace CTVR_API.Controllers
                     {
                         return new JsonResult(5); // Erreur d'insertion
                     }
-                }
-                catch
-                {
+                } catch {
                     return new JsonResult(6); // une clé étrangère ne correxpond pas
-                }
+                }   
             }
 
             return new JsonResult(1); // Ajout réussi
@@ -183,149 +179,52 @@ namespace CTVR_API.Controllers
 
 
         [HttpPost]
-        public JsonResult updateParcours(string oldnopermis, string rawoldhoraireservice, Int16? noligne, string? immat, string? nopermis, string? rawhoraireservice)
+        public JsonResult updateParcours(string? oldnopermis, DateTime? oldhoraireservice, int? noligne, string? immat, string? nopermis, DateTime? horaireservice)
         {
 
 
-
-
-            if (oldnopermis == null || rawoldhoraireservice == null)
+            if (oldnopermis == null || oldhoraireservice == null || noligne == null || immat == null || nopermis == null || horaireservice == null)
             {
                 return new JsonResult(2); // champ manquant
             }
 
-            DateTime oldhoraireservice = DateTime.Parse(rawoldhoraireservice);
-
-
-
-            string constraintQuery = "SELECT * FROM Parcours WHERE nopermis=@oldnopermis and horaireservice=@oldhoraireservice ";
+            string constraintQuery = "SELECT * FROM Parcours WHERE nopermis = @nopermis and horaireservice = @horaireservice";
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
             {
-                cmd.Parameters.AddWithValue("@oldnopermis", oldnopermis);
-                cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
-
-
+                cmd.Parameters.AddWithValue("@nopermis", oldnopermis);
+                cmd.Parameters.AddWithValue("@horaireservice", oldhoraireservice);
 
                 using (var reader = cmd.ExecuteReader())
                 {
                     if (!reader.Read())
-                        return new JsonResult(3); // L'élément n'existe pas mais devrait
+                        return new JsonResult(3); // L'élément n'existe pas
                 }
             }
 
-
-
-            if (immat != null)
+            string query = "update Parcours set nopermis=@nopermis, immat = @immat, horaireservice = @horaireservice, noligne=@noligne  WHERE nopermis=@oldnopermis and horaireservice=@oldhoraireservice";
+            using (var cmd = dataSource.CreateCommand(query))
             {
-                string query = "update Parcours set immat = @immat WHERE nopermis=@oldnopermis and horaireservice=@oldhoraireservice ";
-                using (var cmd = dataSource.CreateCommand(query))
-                {
-                    cmd.Parameters.AddWithValue("@immat", immat);
-                    cmd.Parameters.AddWithValue("@oldnopermis", oldnopermis);
-                    cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
+                cmd.Parameters.AddWithValue("@nopermis", nopermis);
+                cmd.Parameters.AddWithValue("@immat", immat);
+                cmd.Parameters.AddWithValue("@horaireservice", horaireservice);
+                cmd.Parameters.AddWithValue("@noligne", noligne);
+                cmd.Parameters.AddWithValue("@oldnopermis", oldnopermis);
+                cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
 
-                    try
+                try
+                {
+                    int result = cmd.ExecuteNonQuery();
+                    if (result == 0)
                     {
-                        int result = cmd.ExecuteNonQuery();
-                        if (result == 0)
-                        {
-                            return new JsonResult(5); // Erreur d'insertion
-                        }
-                    }
-                    catch
-                    {
-                        return new JsonResult(6); // une clé étrangère ne correxpond pas
+                        return new JsonResult(5); // Erreur d'insertion
                     }
                 }
-            }
-
-
-
-
-            if (noligne != null)
-            {
-                string query = "update Parcours set noligne=@noligne WHERE nopermis=@oldnopermis and horaireservice=@oldhoraireservice ";
-                using (var cmd = dataSource.CreateCommand(query))
+                catch
                 {
-                    cmd.Parameters.Add("@noligne", NpgsqlTypes.NpgsqlDbType.Integer).Value = noligne;
-                    cmd.Parameters.AddWithValue("@oldnopermis", oldnopermis);
-                    cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
-
-
-                    try
-                    {
-                        int result = cmd.ExecuteNonQuery();
-                        if (result == 0)
-                        {
-                            return new JsonResult(5); // Erreur d'insertion
-                        }
-                    }
-                    catch
-                    {
-                        return new JsonResult(6); // une clé étrangère ne correxpond pas
-                    }
-                }
-            }
-
-            if (nopermis != null)
-            {
-                string query = "update Parcours set nopermis = @nopermis WHERE nopermis=@oldnopermis and horaireservice=@oldhoraireservice";
-                using (var cmd = dataSource.CreateCommand(query))
-                {
-                    cmd.Parameters.AddWithValue("@nopermis", nopermis);
-                    cmd.Parameters.AddWithValue("@oldnopermis", oldnopermis);
-                    cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
-
-                    try
-                    {
-                        int result = cmd.ExecuteNonQuery();
-                        if (result == 0)
-                        {
-                            return new JsonResult(5); // Erreur d'insertion
-                        }
-                    }
-                    catch
-                    {
-                        return new JsonResult(6); // une clé étrangère ne correxpond pas
-                    }
-                }
-
-            }
-
-            if (rawhoraireservice != null)
-            {
-
-                DateTime horaireservice = DateTime.Parse(rawhoraireservice);
-                string query = "update Parcours set horaireservice = @horaireservice WHERE nopermis=@nopermis and horaireservice=@oldhoraireservice ";
-                using (var cmd = dataSource.CreateCommand(query))
-                {
-                    cmd.Parameters.AddWithValue("@horaireservice", horaireservice);
-                    if (nopermis != null)
-                    {
-                        cmd.Parameters.AddWithValue("@nopermis", nopermis);
-                    }
-                    else
-                    {
-                        cmd.Parameters.AddWithValue("@nopermis", oldnopermis);
-                    }
-
-                    cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
-
-                    try
-                    {
-                        int result = cmd.ExecuteNonQuery();
-                        if (result == 0)
-                        {
-                            return new JsonResult(5); // Erreur d'insertion
-                        }
-                    }
-                    catch
-                    {
-                        return new JsonResult(6); // une clé étrangère ne correxpond pas
-                    }
+                    return new JsonResult(6); // une clé étrangère ne correxpond pas
                 }
             }
 
