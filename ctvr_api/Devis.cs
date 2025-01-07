@@ -6,9 +6,15 @@ namespace CTVR_API
     public class Devis
     {
 
-        public string? nom { get; set; }
         public DateOnly? dateCreation { get; set; }
         public List<string> codeF { get; set; }
+        public List<string> codeM { get; set; }
+
+        public double? totalMoe { get; set; }
+
+        public double? totalFourn { get; set; }
+
+
         public double? prix { get; set; }
 
         public double? TVA { get; set; }
@@ -23,13 +29,18 @@ namespace CTVR_API
                 ? (Int16?)fields["norep"]
                 : null;
 
+            totalMoe = fields.ContainsKey("totalMoe") && fields["totalMoe"] != DBNull.Value
+                ? (double?)fields["totalMoe"]
+                : null;
+
+            totalFourn = fields.ContainsKey("totalFourn") && fields["totalFourn"] != DBNull.Value
+                ? (double?)fields["totalFourn"]
+                : null;
+
             dateCreation = fields.ContainsKey("dateCreation") && fields["dateCreation"] != DBNull.Value
                 ? (DateOnly?)fields["dateCreation"]
                 : null;
 
-            nom = fields.ContainsKey("nom") && fields["nom"] != DBNull.Value
-                ? (string?)fields["nom"]
-                : null;
 
             prix = fields.ContainsKey("prix") && fields["prix"] != DBNull.Value
                 ? (double?)fields["prix"]
