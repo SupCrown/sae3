@@ -18,7 +18,7 @@ namespace CTVR_API.Controllers
         public JsonResult GetAllDevis()
         {
 
-            string queryUtil = "SELECT * FROM utiliser";
+            string queryUtil = "SELECT * FROM utiliser where norep not in (select norep from necessiter where nbhdevis = nbhvalidees);";
 
             List<Devis> allDevis = new List<Devis>();
             List<string> listCodeF = new List<string>();
@@ -347,10 +347,102 @@ namespace CTVR_API.Controllers
             return new JsonResult(1);
         }
 
+        [HttpPost]
+        public JsonResult valider(short norep)
+        {
+            string queryQte = "SELECT norep, qtedevis FROM Utiliser WHERE norep = @norep ";
+            string queryH = "SELECT norep, nbhdevis FROM Necessiter WHERE norep = @norep";
+            string updateQuery = "UPDATE Utiliser SET qtevalidee = @qtevalidee WHERE norep = @norep and qtedevis=@qte";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+
+            try
+            {
+                using (var dataSource = NpgsqlDataSource.Create(connectionString))
+                {
+                    // Traitement de la table "Utiliser"
+                    using (var cmdQte = dataSource.CreateCommand(queryQte))
+                    {
+                        cmdQte.Parameters.AddWithValue("@norep", norep);
+
+                        using (var readerQte = cmdQte.ExecuteReader())
+                        {
+                            while (readerQte.Read())
+                            {
+                                // Récupération des valeurs spécifiques à cette ligne
+                                short norepFromReader = readerQte.GetInt16(0); // norep
+                                int qte = readerQte.GetInt32(1);
+                                Console.WriteLine(qte);             // qtevalidee
+
+                                // Mise à jour de la ligne
+                                using (var cmdUpdate = dataSource.CreateCommand(updateQuery))
+                                {
+                                    Console.WriteLine(qte);
+                                    cmdUpdate.Parameters.AddWithValue("@norep", norepFromReader);
+                                    cmdUpdate.Parameters.AddWithValue("@qtevalidee", qte);
+                                    cmdUpdate.Parameters.AddWithValue("@qte", qte);
+
+                                    int result = cmdUpdate.ExecuteNonQuery();
+
+                                    if (result == 0)
+                                    {
+                                        return new JsonResult(5); // Erreur d'insertion
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Traitement de la table "Necessiter"
+                    using (var cmdH = dataSource.CreateCommand(queryH))
+                    {
+                        cmdH.Parameters.AddWithValue("@norep", norep);
+
+                        using (var readerH = cmdH.ExecuteReader())
+                        {
+                            while (readerH.Read())
+                            {
+                                // Récupération des valeurs spécifiques à cette ligne
+                                short norepFromReader = readerH.GetInt16(0); // norep
+                                int H = readerH.GetInt32(1);               // qtevalidee
+
+                                // Mise à jour de la ligne
+                                updateQuery = "UPDATE necessiter SET nbhvalidees = @hvalide WHERE norep = @norep and nbhdevis = @nbh";
+                                using (var cmdUpdate = dataSource.CreateCommand(updateQuery))
+                                {
+                                    cmdUpdate.Parameters.AddWithValue("@norep", norepFromReader);
+                                    cmdUpdate.Parameters.AddWithValue("@hvalide", H);
+                                    cmdUpdate.Parameters.AddWithValue("@nbh", H);
+
+                                    int result = cmdUpdate.ExecuteNonQuery();
+
+                                    if (result == 0)
+                                    {
+                                        return new JsonResult(5); // Erreur d'insertion
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Tout s'est bien passé
+                return new JsonResult(1);
+            }
+            catch (Exception ex)
+            {
+                // Gestion des exceptions
+                return new JsonResult(new { error = ex.Message });
+            }
+        }
+
+
+
+
 
 
         [HttpPost]
-        public JsonResult AddDevis(Int16 norep, Dictionary<string, int> dicPiece, Dictionary<string, int> dicMoe, double taux, double pUnit)
+        public JsonResult AddDevis(Int16 norep, Dictionary<string, Dictionary<string, int>> dicoDevis)
         {
 
             // Vérification de la présence de l'devis à entrer dans la base
@@ -368,79 +460,110 @@ namespace CTVR_API.Controllers
                 }
             }
 
-            string queryNec = "INSERT INTO necessiter(norep, codeM, NbHDevis, @auxHoraire) VALUES (@norep, @codeM, @NbHDevis, @TauxHoraire)";
-            string queryUti = "INSERT INTO devis(norep, codeF, QteDevis, PrixUnitaire) VALUES (@norep, @codeF, @QteDevis, @PrixUnitaire)";
+            string queryNec = "INSERT INTO necessiter(norep, codeM, NbHDevis, tauxHoraire) VALUES (@norep, @codeM, @NbHDevis, @TauxHoraire)";
+            string queryUti = "INSERT INTO utiliser(norep, codeF, QteDevis, PrixUnitaire) VALUES (@norep, @codeF, @QteDevis, @PrixUnitaire)";
             string queryInter = "UPDATE Intervention SET DateDevis = @dateDevis WHERE norep = @norep";
-            string query = "";
 
-            using (var cmd = dataSource.CreateCommand(queryNec))
+            using (var cmd = dataSource.CreateCommand(queryNec))//insertion des ligne dans la table necessiter. iteration autant de fois qu'il y a d'element dans le dico
             {
-                foreach (var item in dicMoe)
+                foreach (var item in dicoDevis["nec"])//iteration dans le dico
                 {
                     cmd.Parameters.Clear();
                     cmd.Parameters.AddWithValue("@norep", norep);
                     cmd.Parameters.AddWithValue("@codeM", item.Key);
                     cmd.Parameters.AddWithValue("@NbHDevis", item.Value);
 
-                    query = "select tauxHoraireCourant from moe where codeM = @codeM";
-                    using (var cmdTaux = dataSource.CreateCommand(Query))
+                    string query = "select tauxHoraireCourant from moe where codeM = @codeM";//recuperation du taux horaire actuel
+                    using (var cmdTaux = dataSource.CreateCommand(query))
                     {
                         cmdTaux.Parameters.AddWithValue("@codeM", item.Key);
                         using (var readerTaux = cmdTaux.ExecuteReader())
                         {
-                            if (reader.Read())
+                            if (readerTaux.Read())
                             {
-                                cmd.Parameters.AddWithValue("@TauxHoraire", item.Key);
+                                cmd.Parameters.AddWithValue("@TauxHoraire", readerTaux.GetInt32(0));
                             }
                         }
                     }
+
                     try
                     {
-                        
+                        int result = cmd.ExecuteNonQuery();
+                        if (result == 0)
+                        {
+                            return new JsonResult(5); // Erreur d'insertion
+                        }
                     }
-                    catch (System.Exception)
+                    catch
                     {
-                        
-                        throw;
+                        return new JsonResult(61); // une clé étrangère ne correxpond pas pour la table necessiter
                     }
 
-                    int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de devis affectées -> 1 si tout se passe bien
                 }
 
+            }//fin de necessiter
 
-                if (result == 0) // si ca n'a pas fonctionné
-                {
-                    return new JsonResult(5);
-                }
-            }
-
-            using (var cmd = dataSource.CreateCommand(queryUti))
+            using (var cmd = dataSource.CreateCommand(queryUti))//insertion des ligne dans la table utiliser. iteration autant de fois qu'il y a d'element dans le dico
             {
-                cmd.Parameters.AddWithValue("@nodevis", nodevis);
-                cmd.Parameters.AddWithValue("@nomarretdepart", nomarretdepart);
-                cmd.Parameters.AddWithValue("@nomarretterminus", nomarretterminus);
-
-                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de devis affectées -> 1 si tout se passe bien
-
-                if (result == 0) // si ca n'a pas fonctionné
+                foreach (var item in dicoDevis["uti"])//iteration dans le dico
                 {
-                    return new JsonResult(5);
-                }
-            }
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("@norep", norep);
+                    cmd.Parameters.AddWithValue("@codeF", item.Key);
+                    cmd.Parameters.AddWithValue("@QteDevis", item.Value);
 
-            using (var cmd = dataSource.CreateCommand(queryInter))
+                    string query = "select prixunitairecourant from fourniture where codef = @codef";//recuperation du prix unitaire actuel
+                    using (var cmdUnit = dataSource.CreateCommand(query))
+                    {
+                        cmdUnit.Parameters.AddWithValue("@codef", item.Key);
+                        using (var readerUnit = cmdUnit.ExecuteReader())
+                        {
+                            if (readerUnit.Read())
+                            {
+                                cmd.Parameters.AddWithValue("@prixunitaire", readerUnit.GetInt32(0));
+                            }
+                        }
+                    }
+
+                    try
+                    {
+                        int result = cmd.ExecuteNonQuery();
+                        if (result == 0)
+                        {
+                            return new JsonResult(5); // Erreur d'insertion
+                        }
+                    }
+                    catch
+                    {
+                        return new JsonResult(62); // une clé étrangère ne correxpond pas pour la table Utiliser
+                    }
+
+                }
+
+            }//fin utiliser
+
+            using (var cmd = dataSource.CreateCommand(queryInter))//insertion de la date courante dans la table intervention pour oficialiser lajout d'un devis pour cette intervention
             {
-                cmd.Parameters.AddWithValue("@nodevis", nodevis);
-                cmd.Parameters.AddWithValue("@nomarretdepart", nomarretdepart);
-                cmd.Parameters.AddWithValue("@nomarretterminus", nomarretterminus);
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@norep", norep);
+                cmd.Parameters.AddWithValue("@datedevis", DateOnly.FromDateTime(DateTime.Now));
 
-                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de devis affectées -> 1 si tout se passe bien
-
-                if (result == 0) // si ca n'a pas fonctionné
+                try
                 {
-                    return new JsonResult(5);
+                    int result = cmd.ExecuteNonQuery();
+                    if (result == 0)
+                    {
+                        return new JsonResult(5); // Erreur d'insertion
+                    }
                 }
-            }
+                catch
+                {
+                    return new JsonResult(63); // une clé étrangère ne correxpond pas pour la table Intervention
+                }
+
+
+
+            }//fin datedevis
 
 
             return new JsonResult(1); // fonctionnement correcte
@@ -451,3 +574,16 @@ namespace CTVR_API.Controllers
 
 
 }
+
+/*tests*************************************************************
+{
+  "nec": {
+    "MOE07": 25,
+    "M100": 30
+  },
+  "uti": {
+    "TURBO": 2,
+    "FAISC": 7
+  }
+}
+*/
