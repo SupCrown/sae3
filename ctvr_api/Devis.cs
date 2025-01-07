@@ -1,58 +1,50 @@
 
-/*using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace CTVR_API
 {
-    public class Intervention
+    public class Devis
     {
 
-        public string Nom { get; set; }
-        public DateOnly? DateCreation { get; set; }
-        public Pieces[] pieces { get; set; }
+        public string? nom { get; set; }
+        public DateOnly? dateCreation { get; set; }
+        public List<string> codeF { get; set; }
+        public double? prix { get; set; }
+
+        public double? TVA { get; set; }
+        public double? prixTTC { get; set; }
+
         public Int16? norep { get; set; }
 
-        public DateOnly? datefinreparation { get; set; }
-        public DateOnly? datedevis { get; set; }
 
-        public DateOnly? datedebutreparation { get; set; }
-        public string immat { get; set; }
-
-        public Int16? annee { get; set; }
-       
-        public Int16? noseq { get; set; }
-
-
-        public Intervention(Dictionary<string, object> fields)
+        public Devis(Dictionary<string, object> fields)
         {
-            norep = fields.ContainsKey("norep") ? (Int16?)fields["norep"] : null;
-
-            annee = fields.ContainsKey("annee") ? (Int16?)fields["annee"] : null;
-            
-            noseq = fields.ContainsKey("noseq") ? (Int16?)fields["noseq"] : null;
-
-
-            datedevis = fields.ContainsKey("datedevis") && fields["datedevis"] != DBNull.Value
-                ? (DateOnly?)fields["datedevis"]
-                : null;
-            dateentreebus = fields.ContainsKey("dateentreebus") && fields["dateentreebus"] != DBNull.Value
-                ? (DateOnly?)fields["dateentreebus"]
-                : null;
-            description = fields.ContainsKey("description") && fields["description"] != DBNull.Value
-                ? (string)fields["description"]
-                : string.Empty;
-            pieces = fields.ContainsKey("pieces") && fields["pieces"] != DBNull.Value
-                ? (string?)fields["pieces"]
-                : null;
-            datefinreparation = fields.ContainsKey("datefinreparation") && fields["datefinreparation"] != DBNull.Value
-                ? (DateOnly?)fields["datefinreparation"]
-                : null;
-            datedebutreparation = fields.ContainsKey("datedebutreparation") && fields["datedebutreparation"] != DBNull.Value
-                ? (DateOnly?)fields["datedebutreparation"]
+            norep = fields.ContainsKey("norep") && fields["norep"] != DBNull.Value
+                ? (Int16?)fields["norep"]
                 : null;
 
-            immat = fields.ContainsKey("immat") && fields["immat"] != DBNull.Value
-                ? (string)fields["immat"]
-                : string.Empty;
+            dateCreation = fields.ContainsKey("dateCreation") && fields["dateCreation"] != DBNull.Value
+                ? (DateOnly?)fields["dateCreation"]
+                : null;
+
+            nom = fields.ContainsKey("nom") && fields["nom"] != DBNull.Value
+                ? (string?)fields["nom"]
+                : null;
+
+            prix = fields.ContainsKey("prix") && fields["prix"] != DBNull.Value
+                ? (double?)fields["prix"]
+                : null;
+
+            TVA = fields.ContainsKey("TVA") && fields["TVA"] != DBNull.Value
+                ? (double?)fields["TVA"]
+                : null;
+
+            prixTTC = fields.ContainsKey("prixTTC") && fields["prixTTC"] != DBNull.Value
+                ? (double?)fields["prixTTC"]
+                : null;
+
+            codeF = new List<string>();
+
         }
     }
-}*/
+}
