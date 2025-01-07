@@ -15,10 +15,10 @@ namespace CTVR_API.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAllLigne() 
+        public JsonResult GetAllLigne()
         {
-            string query = "SELECT * FROM ligne";
-            
+            string query = "SELECT * FROM ligne ORDER BY noligne ASC";
+
             List<Ligne> Lignes = new List<Ligne>();
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
@@ -77,8 +77,8 @@ namespace CTVR_API.Controllers
         public JsonResult AddLigne(Int16? noligne, string? nomarretdepart, string? nomarretterminus)
         {
             if (noligne == null
-                || string.IsNullOrWhiteSpace(nomarretdepart) 
-                || string.IsNullOrWhiteSpace(nomarretterminus) 
+                || string.IsNullOrWhiteSpace(nomarretdepart)
+                || string.IsNullOrWhiteSpace(nomarretterminus)
                 )
             {
                 return new JsonResult(2); // champ manquant
@@ -86,10 +86,10 @@ namespace CTVR_API.Controllers
 
             // Vérification de la présence de l'Ligne à entrer dans la base
             string constraintQuery = "SELECT * FROM ligne where noligne=@noligne";
-            
+
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
-            
+
             using (var cmd = dataSource.CreateCommand(constraintQuery))
             {
                 cmd.Parameters.AddWithValue("@noligne", noligne);
@@ -106,12 +106,12 @@ namespace CTVR_API.Controllers
                 cmd.Parameters.AddWithValue("@noligne", noligne);
                 cmd.Parameters.AddWithValue("@nomarretdepart", nomarretdepart);
                 cmd.Parameters.AddWithValue("@nomarretterminus", nomarretterminus);
-                
+
                 int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de Ligne affectées -> 1 si tout se passe bien
-                
-                if(result == 0) // si ca n'a pas fonctionné
+
+                if (result == 0) // si ca n'a pas fonctionné
                 {
-                    return new JsonResult(5); 
+                    return new JsonResult(5);
                 }
             }
 
@@ -142,29 +142,27 @@ namespace CTVR_API.Controllers
                     return new JsonResult(3);
                 }
             }
-            
+
             return new JsonResult(1);
         }
 
         [HttpPost]
-        public JsonResult updateIntervention(Int16? noligne, string? nomarretdepart, string? nomarretterminus)
+        public JsonResult updateLigne(Int16? oldnoligne, Int16? noligne, string? nomarretdepart, string? nomarretterminus)
         {
 
-            if (noligne == null || noligne == 0)
+            if (oldnoligne == null || noligne == null || noligne == 0)
             {
                 return new JsonResult(2); // champ manquant
             }
 
 
-            string constraintQuery = "SELECT * FROM ligne WHERE noligne=@noligne";
+            string constraintQuery = "SELECT * FROM ligne WHERE noligne=@oldnoligne";
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
             {
-                cmd.Parameters.AddWithValue("@noligne", noligne);
-
-
+                cmd.Parameters.AddWithValue("@oldnoligne", oldnoligne);
                 using (var reader = cmd.ExecuteReader())
                 {
                     if (!reader.Read())
@@ -172,43 +170,25 @@ namespace CTVR_API.Controllers
                 }
             }
 
-            if (nomarretdepart != null)
+            string query = "update ligne set noligne = @noligne, nomarretdepart = @nomarretdepart, nomarretterminus = @nomarretterminus WHERE noligne = @oldnoligne";
+            using (var cmd = dataSource.CreateCommand(query))
             {
-                string query = "update ligne set nomarretdepart = @nomarretdepart WHERE noligne = @noligne ";
-                using (var cmd = dataSource.CreateCommand(query))
-                {
-                    cmd.Parameters.AddWithValue("@noligne", noligne);
-                    cmd.Parameters.AddWithValue("@nomarretdepart", nomarretdepart);
+                cmd.Parameters.AddWithValue("@oldnoligne", oldnoligne);
+                cmd.Parameters.AddWithValue("@noligne", noligne);
+                cmd.Parameters.AddWithValue("@nomarretdepart", nomarretdepart);
+                cmd.Parameters.AddWithValue("@nomarretterminus", nomarretterminus);
 
-                    int result = cmd.ExecuteNonQuery();
-                    if (result == 0)
-                    {
-                        return new JsonResult(5); // Erreur d'insertion
-                    }
+                int result = cmd.ExecuteNonQuery();
+                if (result == 0)
+                {
+                    return new JsonResult(5); // Erreur d'insertion
                 }
             }
-
-            if (nomarretterminus != null)
-            {
-                string query = "update ligne set nomarretterminus = @nomarretterminus WHERE noligne=@noligne ";
-                using (var cmd = dataSource.CreateCommand(query))
-                {
-                    cmd.Parameters.AddWithValue("@noligne", noligne);
-                    cmd.Parameters.AddWithValue("@nomarretterminus", nomarretterminus);
-
-                    int result = cmd.ExecuteNonQuery();
-                    if (result == 0)
-                    {
-                        return new JsonResult(5); // Erreur d'insertion
-                    }
-                }
-            }
-
 
             return new JsonResult(1); // Ajout réussi
         }
 
     }
 
-    
+
 }
