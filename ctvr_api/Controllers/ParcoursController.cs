@@ -17,70 +17,70 @@ namespace CTVR_API.Controllers
         }
 
         [HttpGet]
-       public JsonResult GetAllParcours(string? filtre, string? nom, string? prenom, string? immat)
-{
-    string query;
-
-    switch (filtre)
-    {
-        case "chauffeur":
-            if (nom != null && prenom != null)
-            {
-                query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) where nom = @nom and prenom = @prenom";
-                break;
-            }
-            else
-            {
-                return new JsonResult(2); // Champ manquant
-            }
-
-        case "immat":
-            if (immat != null)
-            {
-                query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) where immat = @immat";
-                break;
-            }
-            else
-            {
-                return new JsonResult(2); // Champ manquant
-            }
-
-        case "asc":
-            query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) order by nom asc";
-            break;
-
-        case "desc":
-            query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) order by nom desc";
-            break;
-
-        default:
-            query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis)";
-            break;
-    }
-
-    List<Parcours> Parco = new List<Parcours>();
-    string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
-    NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
-
-    using (var connection = dataSource.OpenConnection())
-    {
-        using (var cmd = dataSource.CreateCommand(query))
+        public JsonResult GetAllParcours(string? filtre, string? nom, string? prenom, string? immat)
         {
-            if (filtre == "chauffeur")
+            string query;
+
+            switch (filtre)
             {
-                cmd.Parameters.AddWithValue("@nom", nom);
-                cmd.Parameters.AddWithValue("@prenom", prenom);
-            }
-            else if (filtre == "immat")
-            {
-                cmd.Parameters.AddWithValue("@immat", immat);
+                case "chauffeur":
+                    if (nom != null && prenom != null)
+                    {
+                        query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) where nom = @nom and prenom = @prenom";
+                        break;
+                    }
+                    else
+                    {
+                        return new JsonResult(2); // Champ manquant
+                    }
+
+                case "immat":
+                    if (immat != null)
+                    {
+                        query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) where immat = @immat";
+                        break;
+                    }
+                    else
+                    {
+                        return new JsonResult(2); // Champ manquant
+                    }
+
+                case "asc":
+                    query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) order by nom asc";
+                    break;
+
+                case "desc":
+                    query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis) order by nom desc";
+                    break;
+
+                default:
+                    query = "SELECT nopermis, horaireservice, nom, prenom, noligne, immat FROM Parcours join Conducteur using(nopermis)";
+                    break;
             }
 
-            using (var reader = cmd.ExecuteReader())
+            List<Parcours> Parco = new List<Parcours>();
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var connection = dataSource.OpenConnection())
             {
-                while (reader.Read())
+                using (var cmd = dataSource.CreateCommand(query))
                 {
-                    Dictionary<string, object> ParcoursFields = new Dictionary<string, object>
+                    if (filtre == "chauffeur")
+                    {
+                        cmd.Parameters.AddWithValue("@nom", nom);
+                        cmd.Parameters.AddWithValue("@prenom", prenom);
+                    }
+                    else if (filtre == "immat")
+                    {
+                        cmd.Parameters.AddWithValue("@immat", immat);
+                    }
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Dictionary<string, object> ParcoursFields = new Dictionary<string, object>
                     {
                         { "nopermis", reader.GetString(0) },      // TEXT
                         { "horaireservice", reader.GetDateTime(1) }, // TIMESTAMP
@@ -89,18 +89,18 @@ namespace CTVR_API.Controllers
                         { "noligne", reader.GetInt16(4) },       // INTEGER
                         { "immat", reader.GetString(5) }         // TEXT
                     };
-                    Parco.Add(new Parcours(ParcoursFields));
+                            Parco.Add(new Parcours(ParcoursFields));
+                        }
+                    }
                 }
             }
+
+            return new JsonResult(Parco);
         }
-    }
 
-    return new JsonResult(Parco);
-}
 
-        
         [HttpPost]
-        public JsonResult AddParcours(string nopermis, DateTime horaireservice, Int16 noligne, string immat)
+        public JsonResult AddParcours(string? nopermis, DateTime? horaireservice, Int16? noligne, string? immat)
         {
 
             if (nopermis == null || horaireservice == null || immat == null || noligne == null)
@@ -108,11 +108,11 @@ namespace CTVR_API.Controllers
                 return new JsonResult(2); // champ manquant
             }
 
-
-
-            string constraintQuery = "SELECT * FROM Parcours WHERE nopermis = @nopermis and horaireservice = @horaireservice";
+            string constraintQuery = "SELECT * FROM conducteur WHERE nopermis = @nopermis";
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            constraintQuery = "SELECT * FROM Parcours WHERE nopermis = @nopermis and horaireservice = @horaireservice";
 
             using (var cmd = dataSource.CreateCommand(constraintQuery))
             {
@@ -135,11 +135,17 @@ namespace CTVR_API.Controllers
                 cmd.Parameters.AddWithValue("@noligne", noligne);
                 cmd.Parameters.AddWithValue("@immat", immat);
 
-
-                int result = cmd.ExecuteNonQuery();
-                if (result == 0)
+                try
                 {
-                    return new JsonResult(5); // Erreur d'insertion
+                    int result = cmd.ExecuteNonQuery();
+                    if (result == 0)
+                    {
+                        return new JsonResult(5); // Erreur d'insertion
+                    }
+                }
+                catch
+                {
+                    return new JsonResult(6); // une clé étrangère ne correxpond pas
                 }
             }
 
@@ -176,67 +182,14 @@ namespace CTVR_API.Controllers
         }
 
 
-        //vestige d'une civilisation utopique dans laquel utiliser l'api dans l'api fonctionne
-        /* [HttpPost]
-         public string getOneAtribute(Int16 norep, string atribute)
-         {
-             {
-                 string baseUrl = "http://localhost:5107/api/ParcoursController/GetParcoursById?";
-
-                 // Créer un client HTTP
-                 using (HttpClient client = new HttpClient())
-                 {
-                     try
-                     {
-                         // Construire l'URL de l'API
-                         string url = "http://localhost:5107/api/ParcoursController/GetParcoursById?identifiant=3";
-
-                         // Envoyer une requête GET à l'API et attendre le résultat
-                         HttpResponseMessage response = client.GetAsync(url).Result;
-
-                         if (response.IsSuccessStatusCode)
-                         {
-                             // Lire la réponse JSON et attendre le résultat
-                             string jsonResponse = response.Content.ReadAsStringAsync().Result;
-
-                             // Parser le JSON pour accéder aux valeurs
-                             var json = JObject.Parse(jsonResponse);
-                             string atrib = json[atribute]?.ToString();
-                             return atrib ?? "Attribut introuvable";
-                         }
-                         else
-                         {
-                             return "Erreur : API non accessible";
-                         }
-                     }
-                     catch (Exception ex)
-                     {
-                         return $"Une erreur est survenue : {ex.Message}";
-                     }
-                 }
-             }
-         }
-
-
-
-         [HttpPost]
-         public IActionResult test()
-         {
-             Console.WriteLine("test");
-             string result = getOneAtribute(3, "datedevis");
-             Console.WriteLine(result);
-
-             return Ok(result); // Renvoie le résultat comme réponse HTTP 200
-         }*/
-
         [HttpPost]
-        public JsonResult updateParcours(string oldnopermis, string rawoldhoraireservice, Int16? noligne, string? immat, string? nopermis, string? rawhoraireservice )
+        public JsonResult updateParcours(string oldnopermis, string rawoldhoraireservice, Int16? noligne, string? immat, string? nopermis, string? rawhoraireservice)
         {
 
 
 
 
-            if (oldnopermis == null || rawoldhoraireservice == null ) 
+            if (oldnopermis == null || rawoldhoraireservice == null)
             {
                 return new JsonResult(2); // champ manquant
             }
@@ -253,7 +206,7 @@ namespace CTVR_API.Controllers
             {
                 cmd.Parameters.AddWithValue("@oldnopermis", oldnopermis);
                 cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
-                
+
 
 
                 using (var reader = cmd.ExecuteReader())
@@ -263,7 +216,7 @@ namespace CTVR_API.Controllers
                 }
             }
 
-            
+
 
             if (immat != null)
             {
@@ -274,10 +227,17 @@ namespace CTVR_API.Controllers
                     cmd.Parameters.AddWithValue("@oldnopermis", oldnopermis);
                     cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
 
-                    int result = cmd.ExecuteNonQuery();
-                    if (result == 0)
+                    try
                     {
-                        return new JsonResult(5); // Erreur d'insertion
+                        int result = cmd.ExecuteNonQuery();
+                        if (result == 0)
+                        {
+                            return new JsonResult(5); // Erreur d'insertion
+                        }
+                    }
+                    catch
+                    {
+                        return new JsonResult(6); // une clé étrangère ne correxpond pas
                     }
                 }
             }
@@ -285,7 +245,7 @@ namespace CTVR_API.Controllers
 
 
 
-            if (noligne != null) 
+            if (noligne != null)
             {
                 string query = "update Parcours set noligne=@noligne WHERE nopermis=@oldnopermis and horaireservice=@oldhoraireservice ";
                 using (var cmd = dataSource.CreateCommand(query))
@@ -295,12 +255,17 @@ namespace CTVR_API.Controllers
                     cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
 
 
-
-
-                    int result = cmd.ExecuteNonQuery();
-                    if (result == 0)
+                    try
                     {
-                        return new JsonResult(5); // Erreur d'insertion
+                        int result = cmd.ExecuteNonQuery();
+                        if (result == 0)
+                        {
+                            return new JsonResult(5); // Erreur d'insertion
+                        }
+                    }
+                    catch
+                    {
+                        return new JsonResult(6); // une clé étrangère ne correxpond pas
                     }
                 }
             }
@@ -314,10 +279,17 @@ namespace CTVR_API.Controllers
                     cmd.Parameters.AddWithValue("@oldnopermis", oldnopermis);
                     cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
 
-                    int result = cmd.ExecuteNonQuery();
-                    if (result == 0)
+                    try
                     {
-                        return new JsonResult(5); // Erreur d'insertion
+                        int result = cmd.ExecuteNonQuery();
+                        if (result == 0)
+                        {
+                            return new JsonResult(5); // Erreur d'insertion
+                        }
+                    }
+                    catch
+                    {
+                        return new JsonResult(6); // une clé étrangère ne correxpond pas
                     }
                 }
 
@@ -325,24 +297,34 @@ namespace CTVR_API.Controllers
 
             if (rawhoraireservice != null)
             {
-                
+
                 DateTime horaireservice = DateTime.Parse(rawhoraireservice);
                 string query = "update Parcours set horaireservice = @horaireservice WHERE nopermis=@nopermis and horaireservice=@oldhoraireservice ";
                 using (var cmd = dataSource.CreateCommand(query))
                 {
                     cmd.Parameters.AddWithValue("@horaireservice", horaireservice);
-                    if (nopermis != null){
+                    if (nopermis != null)
+                    {
                         cmd.Parameters.AddWithValue("@nopermis", nopermis);
-                    }else{ 
+                    }
+                    else
+                    {
                         cmd.Parameters.AddWithValue("@nopermis", oldnopermis);
                     }
-                    
+
                     cmd.Parameters.AddWithValue("@oldhoraireservice", oldhoraireservice);
 
-                    int result = cmd.ExecuteNonQuery();
-                    if (result == 0)
+                    try
                     {
-                        return new JsonResult(5); // Erreur d'insertion
+                        int result = cmd.ExecuteNonQuery();
+                        if (result == 0)
+                        {
+                            return new JsonResult(5); // Erreur d'insertion
+                        }
+                    }
+                    catch
+                    {
+                        return new JsonResult(6); // une clé étrangère ne correxpond pas
                     }
                 }
             }
