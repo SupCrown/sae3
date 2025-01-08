@@ -17,7 +17,7 @@ namespace CTVR_API.Controllers
         [HttpGet]
         public JsonResult getAllconducteur()
         {
-            string query = "SELECT * FROM conducteurs order by nom";
+            string query = "SELECT * FROM conducteur order by nom";
 
             List<Conducteur> conducteur = new List<Conducteur>();
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
@@ -56,7 +56,7 @@ namespace CTVR_API.Controllers
                 return new JsonResult(2); // champ manquant
             }
 
-            string query = "SELECT * FROM Conducteurs WHERE nopermis=@nopermis";
+            string query = "SELECT * FROM Conducteur WHERE nopermis=@nopermis";
 
             Conducteur? conducteur = null;
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
@@ -108,7 +108,7 @@ namespace CTVR_API.Controllers
             }
 
             // Vérification de la présence de l'Conducteur à entrer dans la base
-            string constraintQuery = "SELECT * FROM Conducteurs where nopermis=@nopermis";
+            string constraintQuery = "SELECT * FROM Conducteur where nopermis=@nopermis";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
@@ -125,7 +125,7 @@ namespace CTVR_API.Controllers
                 }
             }
 
-            string query = "INSERT INTO Conducteurs VALUES (@nopermis, @datepermis, @lieudelivrance, @dateprisefonction, @nom, @prenom, @datenaissance, @adresse, @codepostal, @ville)";
+            string query = "INSERT INTO Conducteur VALUES (@nopermis, @datepermis, @lieudelivrance, @dateprisefonction, @nom, @prenom, @datenaissance, @adresse, @codepostal, @ville)";
 
             using (var cmd = dataSource.CreateCommand(query))
             {
@@ -138,7 +138,7 @@ namespace CTVR_API.Controllers
                 cmd.Parameters.AddWithValue("@datenaissance", datenaissance);
                 cmd.Parameters.AddWithValue("@adresse", adresse);
                 cmd.Parameters.AddWithValue("@codepostal", codepostal);
-                cmd.Parameters.AddWithValue("@vile", ville);
+                cmd.Parameters.AddWithValue("@ville", ville);
 
                 int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
 
@@ -159,7 +159,7 @@ namespace CTVR_API.Controllers
                 return new JsonResult(2); // champ manquant
             }
 
-            string query = "DELETE FROM Conducteurs WHERE nopermis=@nopermis";
+            string query = "DELETE FROM Conducteur WHERE nopermis=@nopermis";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
@@ -197,7 +197,7 @@ namespace CTVR_API.Controllers
             }
 
             // Vérification de la présence du Conducteur à modifier dans la base
-            string constraintQuery = "SELECT * FROM Conducteurs where nopermis=@nopermis";
+            string constraintQuery = "SELECT * FROM Conducteur where nopermis=@nopermis";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
@@ -207,14 +207,14 @@ namespace CTVR_API.Controllers
                 cmd.Parameters.AddWithValue("@nopermis", nopermis);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read())
+                    if (!reader.Read())
                     {
                         return new JsonResult(3); // L'élément n'existe pas
                     }
                 }
             }
 
-            string query = "update conducteur set nopermis = @nopermis, datepermis=@datepermis, lieudelivrancepermis=@lieudelivrance, dateprisefonction=@dateprisefonction, nom=@nom, prenom=@prenom, datenaissance=@datenaissance, adresse=@adresse, codepostal=@codepostal, ville=@ville ";
+            string query = "update conducteur set nopermis =@nopermis, datepermis=@datepermis, lieudelivrancepermis=@lieudelivrance, dateprisefonction=@dateprisefonction, nom=@nom, prenom=@prenom, datenaissance=@datenaissance, adresse=@adresse, codepostal=@codepostal, ville=@ville where nopermis = @npermis";
 
             using (var cmd = dataSource.CreateCommand(query))
             {
@@ -227,7 +227,9 @@ namespace CTVR_API.Controllers
                 cmd.Parameters.AddWithValue("@datenaissance", datenaissance);
                 cmd.Parameters.AddWithValue("@adresse", adresse);
                 cmd.Parameters.AddWithValue("@codepostal", codepostal);
-                cmd.Parameters.AddWithValue("@vile", ville);
+                cmd.Parameters.AddWithValue("@ville", ville);
+                cmd.Parameters.AddWithValue("@npermis", nopermis);
+
 
                 int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
 
