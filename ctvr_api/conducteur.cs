@@ -24,7 +24,6 @@ namespace CTVR_API
 
             datepermis = (DateOnly)fields["datepermis"];
 
-
             dateprisefonction = (DateOnly)fields["dateprisefonction"]; 
                 
             nom = (string)fields["nom"];
@@ -34,7 +33,6 @@ namespace CTVR_API
             lieudelivrance = (string)fields["lieudelivrance"];
             
             datenaissance = (DateOnly)fields["datenaissance"]; 
-
             
             adresse = (string)fields["adresse"];
 
