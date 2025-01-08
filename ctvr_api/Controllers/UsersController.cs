@@ -103,7 +103,8 @@ namespace CTVR_API.Controllers
                 cmd.Parameters.AddWithValue("@identifiant", identifiant);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read()) return new JsonResult(4); // l'élément existe déjà
+                    if (reader.Read()) 
+                        return new JsonResult(4); // l'élément existe déjà
                 }
             }
 
