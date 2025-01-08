@@ -5,20 +5,20 @@ namespace CTVR_API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class busController : ControllerBase
+    public class BusController : ControllerBase
     {
         private IConfiguration _configuration;
 
-        public busController(IConfiguration configuration)
+        public BusController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
         [HttpGet]
-        public JsonResult GetAllbus() 
+        public JsonResult GetAllbus()
         {
-            string query = "SELECT * FROM bus";
-            
+            string query = "SELECT * FROM bus ORDER BY immat ASC";
+
             List<Bus> buses = new List<Bus>();
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
@@ -83,16 +83,16 @@ namespace CTVR_API.Controllers
 
             // Vérification de la présence du Bus à entrer dans la base
             string constraintQuery = "SELECT * FROM bus where immat=@immat";
-            
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
-            
+
             using (var cmd = dataSource.CreateCommand(constraintQuery))
             {
                 cmd.Parameters.AddWithValue("@immat", immat);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read()) return new JsonResult(4); // l'élément existe déjà
+                    if (reader.Read())
+                        return new JsonResult(4); // l'élément existe déjà
                 }
             }
 
@@ -102,12 +102,12 @@ namespace CTVR_API.Controllers
             {
                 cmd.Parameters.AddWithValue("@immat", immat);
                 cmd.Parameters.AddWithValue("@miseenservice", miseenservice);
-                
+
                 int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
-                
-                if(result == 0) // si ca n'a pas fonctionné
+
+                if (result == 0) // si ca n'a pas fonctionné
                 {
-                    return new JsonResult(5); 
+                    return new JsonResult(5);
                 }
             }
 
@@ -138,7 +138,7 @@ namespace CTVR_API.Controllers
                     return new JsonResult(3);
                 }
             }
-            
+
             return new JsonResult(1);
         }
 
