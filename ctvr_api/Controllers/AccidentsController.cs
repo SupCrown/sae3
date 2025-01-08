@@ -17,7 +17,7 @@ namespace CTVR_API.Controllers
         [HttpGet]
         public JsonResult GetAllAccidents()
         {
-            string query = "SELECT * FROM accident";
+            string query = "SELECT annee, noseq, dateaccident, heureaccident, rue, a.codepostal, a.ville, dateouverturedossier, datetransmissionassur, datevalidationassur, datecloturedossier, nopermis, horaireservice, nom, prenom FROM accident a JOIN survenir USING(annee, noseq) JOIN parcours USING(nopermis, horaireservice) JOIN conducteur USING(nopermis) ORDER BY annee DESC, noseq DESC";
 
             List<Dictionary<string, object?>> accidents = []; // [] = new List<Accident>()
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
@@ -37,16 +37,24 @@ namespace CTVR_API.Controllers
                         accidentFields.Add("rue", reader.GetString(4));
                         accidentFields.Add("codepostal", reader.GetString(5));
                         accidentFields.Add("ville", reader.GetString(6));
+                        /*accidentFields.Add("dateouverturedossier", DateOnly.FromDateTime(reader.GetDateTime(7)));
+                        accidentFields.Add("datetransmissionassur", reader.IsDBNull(8) ? null : DateOnly.FromDateTime(reader.GetDateTime(8)));
+                        accidentFields.Add("datevalidationassur", reader.IsDBNull(9) ? null : DateOnly.FromDateTime(reader.GetDateTime(9)));
+                        accidentFields.Add("datecloturedossier", reader.IsDBNull(10) ? null : DateOnly.FromDateTime(reader.GetDateTime(10)));*/
+                        accidentFields.Add("nopermis", reader.GetString(11));
+                        accidentFields.Add("horaireservice", reader.GetDateTime(12));
+                        accidentFields.Add("nom", reader.GetString(13));
+                        accidentFields.Add("prenom", reader.GetString(14));
 
-                        if (!reader.IsDBNull(11))
+                        if (!reader.IsDBNull(10))
                         {
-                            accidentFields.Add("etatdossieraccident", EtatsAccident.Cloturer.ToString());
-                        }
-                        else if (!reader.IsDBNull(10))
-                        {
-                            accidentFields.Add("etatdossieraccident", EtatsAccident.Valide.ToString());
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Cloturé.ToString());
                         }
                         else if (!reader.IsDBNull(9))
+                        {
+                            accidentFields.Add("etatdossieraccident", EtatsAccident.Validé.ToString());
+                        }
+                        else if (!reader.IsDBNull(8))
                         {
                             accidentFields.Add("etatdossieraccident", EtatsAccident.Transmit.ToString());
                         }
@@ -62,11 +70,11 @@ namespace CTVR_API.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetOneByID(int? annee, int? noseq)
+        public JsonResult GetOneByID(int? annee, int? noseq, string? nopermis, DateTime? horaireservice)
         {
-            if (annee==null || noseq == null) return new JsonResult(2); // chanmp manquant
+            if (annee==null || noseq == null || string.IsNullOrWhiteSpace(nopermis) || horaireservice == null) return new JsonResult(2); // chanmp manquant
 
-            string query = "SELECT * FROM accident WHERE annee=@annee AND noseq=@noseq";
+            string query = "SELECT dateaccident, heureaccident, rue, a.codepostal, a.ville, resumecirconstances, codeintemp, nom, prenom, immat, nopermis, dommagesbus, dommagesconducteur, signatureconducteur, signaturecontroleur, nomarretdepart, nomarretterminus FROM accident a join survenir using(annee, noseq) JOIN parcours USING(nopermis, horaireservice) JOIN conducteur USING(nopermis) join ligne using(noligne) WHERE annee=@annee AND noseq=@noseq AND nopermis=@nopermis AND horaireservice=@horaireservice";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
@@ -77,6 +85,8 @@ namespace CTVR_API.Controllers
             {
                 cmd.Parameters.AddWithValue("@annee", annee);
                 cmd.Parameters.AddWithValue("@noseq", noseq);
+                cmd.Parameters.AddWithValue("@nopermis", nopermis);
+                cmd.Parameters.AddWithValue("@horaireservice", horaireservice);
                 using (NpgsqlDataReader reader = cmd.ExecuteReader())
                 {
                     if (!reader.Read())
@@ -84,20 +94,23 @@ namespace CTVR_API.Controllers
                         return new JsonResult(3); // l'élément n'existe pas
                     } else
                     {
-                        accidentFields.Add("annee", reader.GetInt32(0));
-                        accidentFields.Add("noseq", reader.GetInt32(1));
-                        accidentFields.Add("dateaccident", DateOnly.FromDateTime(reader.GetDateTime(2)));
-                        accidentFields.Add("heureaccident", reader.GetTimeSpan(3));
-                        accidentFields.Add("rue", reader.GetString(4));
-                        accidentFields.Add("codepostal", reader.GetString(5));
-                        accidentFields.Add("ville", reader.GetString(6));
-                        accidentFields.Add("resumecirconstances", reader.GetString(7));
-                        accidentFields.Add("dateouverturedossier", DateOnly.FromDateTime(reader.GetDateTime(8)));
-                        accidentFields.Add("datetransmissionassur", reader.IsDBNull(9) ? null : DateOnly.FromDateTime(reader.GetDateTime(9)));
-                        accidentFields.Add("datevalidationassur", reader.IsDBNull(10) ? null : DateOnly.FromDateTime(reader.GetDateTime(10)));
-                        accidentFields.Add("datecloturedossier", reader.IsDBNull(11) ? null : DateOnly.FromDateTime(reader.GetDateTime(11)));
-                        accidentFields.Add("sommerecue", reader.IsDBNull(12) ? null : reader.GetInt32(12));
-                        accidentFields.Add("intemperie", reader.GetString(13));
+                        accidentFields.Add("dateaccident", DateOnly.FromDateTime(reader.GetDateTime(0)));
+                        accidentFields.Add("heureaccident", reader.GetTimeSpan(1));
+                        accidentFields.Add("rue", reader.GetString(2));
+                        accidentFields.Add("codepostal", reader.GetString(3));
+                        accidentFields.Add("ville", reader.GetString(4));
+                        accidentFields.Add("resumecirconstances", reader.GetString(5));
+                        accidentFields.Add("intemperie", reader.GetString(6));
+                        accidentFields.Add("nom", reader.GetString(7));
+                        accidentFields.Add("prenom", reader.GetString(8));
+                        accidentFields.Add("immat", reader.GetString(9));
+                        accidentFields.Add("nopermis", reader.GetString(10));
+                        accidentFields.Add("dommagesbus", reader.GetString(11));
+                        accidentFields.Add("dommagesconducteur", reader.GetString(12));
+                        accidentFields.Add("signatureconducteur", reader.GetBoolean(13));
+                        accidentFields.Add("signaturecontroleur", reader.GetBoolean(14));
+                        accidentFields.Add("depart", reader.GetString(15));
+                        accidentFields.Add("terminus", reader.GetString(16));
                     }
                 }
             }
@@ -138,6 +151,7 @@ namespace CTVR_API.Controllers
                     }
                 }
             }
+
             accidentFields.Add("impliquers", impliquers);
             return new JsonResult(new List<Object> { accidentFields });
         }
