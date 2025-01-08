@@ -29,12 +29,13 @@ namespace CTVR_API.Controllers
                 {
                     while (reader.Read()) // pour chacune des lignes renvoyées
                     {
-                        Dictionary<string, string> userFields = new Dictionary<string, string>();
+                        Dictionary<string, string?> userFields = new Dictionary<string, string?>();
                         userFields.Add("identifiant", reader.GetString(0));
-                        userFields.Add("nom", reader.GetString(1));
-                        userFields.Add("prenom", reader.GetString(2));
-                        userFields.Add("motDePasse", reader.GetString(3));
-                        userFields.Add("role", reader.GetString(4));
+                        userFields.Add("nopermis", reader.IsDBNull(1)? null : reader.GetString(1));
+                        userFields.Add("nom", reader.GetString(2));
+                        userFields.Add("prenom", reader.GetString(3));
+                        userFields.Add("motDePasse", reader.GetString(4));
+                        userFields.Add("role", reader.GetString(5));
                         users.Add(new Utilisateur(userFields));
                     }
                 }
@@ -63,14 +64,15 @@ namespace CTVR_API.Controllers
 
                 using (var reader = cmd.ExecuteReader())
                 {
-                    Dictionary<string, string> userFields = new Dictionary<string, string>();
+                    Dictionary<string, string?> userFields = new Dictionary<string, string?>();
                     if (reader.Read()) // ssi on a un retour
                     {
                         userFields.Add("identifiant", reader.GetString(0));
-                        userFields.Add("nom", reader.GetString(1));
-                        userFields.Add("prenom", reader.GetString(2));
-                        userFields.Add("motDePasse", reader.GetString(3));
-                        userFields.Add("role", reader.GetString(4));
+                        userFields.Add("nopermis", reader.IsDBNull(1) ? null : reader.GetString(1));
+                        userFields.Add("nom", reader.GetString(2));
+                        userFields.Add("prenom", reader.GetString(3));
+                        userFields.Add("motDePasse", reader.GetString(4));
+                        userFields.Add("role", reader.GetString(5));
                         user = new Utilisateur(userFields);
                         return new JsonResult(user);
                     }

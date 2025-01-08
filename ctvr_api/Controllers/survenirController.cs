@@ -5,11 +5,11 @@ namespace CTVR_API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class survenirController : ControllerBase
+    public class SurvenirController : ControllerBase
     {
         private IConfiguration _configuration;
 
-        public survenirController(IConfiguration configuration)
+        public SurvenirController(IConfiguration configuration)
         {
             _configuration = configuration;
         }

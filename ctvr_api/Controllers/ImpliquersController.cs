@@ -14,7 +14,7 @@ namespace ctvr_api.Controllers
             _configuration = configuration;
         }
 
-        [HttpPut]
+        [HttpPost]
         public JsonResult Insert(int? annee, int? noseq, int? notiers, string? natureblessures, string? degatsmateriels)
         {
             if (annee == null || noseq == null ||

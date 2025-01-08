@@ -15,7 +15,7 @@ namespace ctvr_api.Controllers
             _configuration = configuration;
         }
 
-        [HttpPut]
+        [HttpPost]
         public JsonResult Insert(string? nomtiers, string? prenomtiers, DateOnly? datenaissance, string? adressetiers, string? cptiers, string? villetiers)
         {
             if (string.IsNullOrWhiteSpace(nomtiers) ||
