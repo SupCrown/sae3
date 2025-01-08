@@ -32,7 +32,7 @@ namespace CTVR_API.Controllers
                         Dictionary<string, object> fournitureFields = new Dictionary<string, object>();
                         fournitureFields.Add("codeF", reader.GetString(0));
                         fournitureFields.Add("libelleF", reader.GetString(1));
-                        fournitureFields.Add("prixUnitaire", reader.GetFloat(2));
+                        fournitureFields.Add("prixUnitaire", reader.GetDouble(2));
                         fournitures.Add(new Fourniture(fournitureFields));
                     }
                 }
@@ -64,7 +64,7 @@ namespace CTVR_API.Controllers
                     {
                         fournitureFields.Add("codeF", reader.GetString(0));
                         fournitureFields.Add("libelleF", reader.GetString(1));
-                        fournitureFields.Add("prixUnitaire", reader.GetFloat(2));
+                        fournitureFields.Add("prixUnitaire", reader.GetDouble(2));
                         fourniture = new Fourniture(fournitureFields);
                         return new JsonResult(fourniture);
                     }

@@ -19,7 +19,7 @@ namespace CTVR_API.Controllers
         {
             string query = "SELECT * FROM moe";
 
-            List<MOE> MOE = new List<MOE>();
+            List<MOE> moes = new List<MOE>();
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
 
@@ -30,42 +30,42 @@ namespace CTVR_API.Controllers
                     while (reader.Read()) // pour chacune des moe renvoyées
                     {
                         Dictionary<string, object> moeFields = new Dictionary<string, object>();
-                        moeFields.Add("codeF", reader.GetString(0));
-                        moeFields.Add("libelleF", reader.GetString(1));
-                        moeFields.Add("prixUnitaire", reader.GetFloat(2));
-                        MOE.Add(new moe(moeFields));
+                        moeFields.Add("codeM", reader.GetString(0));
+                        moeFields.Add("libelleM", reader.GetString(1));
+                        moeFields.Add("tauxHoraire", reader.GetDouble(2));
+                        moes.Add(new MOE(moeFields));
                     }
                 }
             }
 
-            return new JsonResult(MOE);
+            return new JsonResult(moes);
         }
 
         [HttpPost]
-        public JsonResult GetmoeBylibelle(String? libelleF)
+        public JsonResult GetmoeBylibelle(String? libelleM)
         {
-            if (libelleF == null)
+            if (libelleM == null)
             {
                 return new JsonResult(2); // champ manquant
             }
-            moe moe = null;
-            string query = "SELECT * FROM moe WHERE libelleF=@libelleF";
+            MOE moe = null;
+            string query = "SELECT * FROM moe WHERE libelleM=@libelleM";
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
 
             using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
             {
-                cmd.Parameters.AddWithValue("@LibelleF", libelleF); // ajout du paramètre
+                cmd.Parameters.AddWithValue("@LibelleM", libelleM); // ajout du paramètre
 
                 using (var reader = cmd.ExecuteReader())
                 {
                     Dictionary<string, Object> moeFields = new Dictionary<string, Object>();
                     if (reader.Read()) // ssi on a un retour
                     {
-                        moeFields.Add("codeF", reader.GetString(0));
-                        moeFields.Add("libelleF", reader.GetString(1));
-                        moeFields.Add("prixUnitaire", reader.GetFloat(2));
-                        moe = new moe(moeFields);
+                        moeFields.Add("codeM", reader.GetString(0));
+                        moeFields.Add("libelleM", reader.GetString(1));
+                        moeFields.Add("tauxHoraire", reader.GetDouble(2));
+                        moe = new MOE(moeFields);
                         return new JsonResult(moe);
                     }
                 }
