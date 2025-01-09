@@ -82,9 +82,11 @@ namespace CTVR_API.Controllers
                         conductFields.Add("codepostal", reader.GetString(8));
                         conductFields.Add("ville", reader.GetString(9));
                         conducteur = new Conducteur(conductFields);
-                        return new JsonResult(conducteur);
+                        List<Conducteur> conducteurResult = [];
+                        conducteurResult.Add(conducteur);
+                        return new JsonResult(conducteurResult);
                     }
-                }
+                }   
             }
             return new JsonResult(3); // l'élément n'existe pas
         }

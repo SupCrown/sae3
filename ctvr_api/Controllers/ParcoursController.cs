@@ -98,6 +98,38 @@ namespace CTVR_API.Controllers
             return new JsonResult(Parco);
         }
 
+        [HttpPost]
+        public JsonResult getParcoursByNoPermis(string? nopermis)
+        {
+            if (string.IsNullOrWhiteSpace(nopermis))
+            {
+                return new JsonResult(2); // champ manquant
+            }
+
+            string query = "SELECT horaireservice, immat, noligne FROM parcours WHERE nopermis=@nopermis ORDER BY horaireservice ASC";
+
+            List<Dictionary<string, object>> parcours = [];
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
+            {
+                cmd.Parameters.AddWithValue("@nopermis", nopermis); // ajout du paramètre
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read()) // ssi on a un retour
+                    {
+                        Dictionary<string, object> parcoursFields = new Dictionary<string, object>();
+                        parcoursFields.Add("horaireservice",reader.GetDateTime(0));
+                        parcoursFields.Add("immat", reader.GetString(1));
+                        parcoursFields.Add("noligne", reader.GetInt16(2));
+                        parcours.Add(parcoursFields);
+                    }
+                    return new JsonResult(parcours);
+                }
+            }
+        }
 
         [HttpPost]
         public JsonResult AddParcours(string? nopermis, DateTime? horaireservice, Int16? noligne, string? immat)

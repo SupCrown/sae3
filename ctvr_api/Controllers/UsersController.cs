@@ -15,10 +15,10 @@ namespace CTVR_API.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAllUsers() 
+        public JsonResult GetAllUsers()
         {
             string query = "SELECT * FROM Utilisateurs";
-            
+
             List<Utilisateur> users = new List<Utilisateur>();
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
@@ -31,7 +31,7 @@ namespace CTVR_API.Controllers
                     {
                         Dictionary<string, string?> userFields = new Dictionary<string, string?>();
                         userFields.Add("identifiant", reader.GetString(0));
-                        userFields.Add("nopermis", reader.IsDBNull(1)? null : reader.GetString(1));
+                        userFields.Add("nopermis", reader.IsDBNull(1) ? null : reader.GetString(1));
                         userFields.Add("nom", reader.GetString(2));
                         userFields.Add("prenom", reader.GetString(3));
                         userFields.Add("motDePasse", reader.GetString(4));
@@ -82,11 +82,11 @@ namespace CTVR_API.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddUser(string? identifiant, string? nom, string? prenom, string? motDePasse, string? role)
+        public JsonResult AddUser(string? identifiant, string? nom, string? prenom, string? nopermis, string? motDePasse, string? role)
         {
             if (string.IsNullOrWhiteSpace(identifiant)
-                || string.IsNullOrWhiteSpace(nom) 
-                || string.IsNullOrWhiteSpace(prenom) 
+                || string.IsNullOrWhiteSpace(nom)
+                || string.IsNullOrWhiteSpace(prenom)
                 || string.IsNullOrWhiteSpace(motDePasse)
                 || string.IsNullOrWhiteSpace(role)
                 )
@@ -96,42 +96,121 @@ namespace CTVR_API.Controllers
 
             // Vérification de la présence de l'utilisateur à entrer dans la base
             string constraintQuery = "SELECT * FROM utilisateurs where identifiant=@identifiant";
-            
+
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
-            
+
             using (var cmd = dataSource.CreateCommand(constraintQuery))
             {
                 cmd.Parameters.AddWithValue("@identifiant", identifiant);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read()) 
+                    if (reader.Read())
                         return new JsonResult(4); // l'élément existe déjà
                 }
             }
 
-            string query = "INSERT INTO utilisateurs VALUES (@identifiant, @nom, @prenom, @motDePasse, @role)";
+            string query = "INSERT INTO utilisateurs VALUES (@identifiant, @nopermis, @nom, @prenom, @motDePasse, @role)";
+
+            if (string.IsNullOrWhiteSpace(nopermis))
+            {
+                query = "INSERT INTO utilisateurs VALUES (@identifiant, null, @nom, @prenom, @motDePasse, @role)";
+            }
 
             using (var cmd = dataSource.CreateCommand(query))
             {
                 cmd.Parameters.AddWithValue("@identifiant", identifiant);
                 cmd.Parameters.AddWithValue("@nom", nom);
                 cmd.Parameters.AddWithValue("@prenom", prenom);
+                if (!string.IsNullOrWhiteSpace(nopermis))
+                    cmd.Parameters.AddWithValue("@nopermis", nopermis);
                 cmd.Parameters.AddWithValue("@motDePasse", motDePasse);
                 cmd.Parameters.AddWithValue("@role", role);
-                
-                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
-                
-                if(result == 0) // si ca n'a pas fonctionné
+
+                try
                 {
-                    return new JsonResult(5); 
+                    int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+                    if (result == 0) // si ca n'a pas fonctionné
+                    {
+                        return new JsonResult(5);
+                    }
+                }
+                catch
+                {
+                    return new JsonResult(6);
                 }
             }
 
             return new JsonResult(1); // fonctionnement correcte
         }
 
-        [HttpDelete]
+        [HttpPost]
+        public JsonResult UpdateUser(string? oldid, string? identifiant, string? nom, string? prenom, string? nopermis, string? motDePasse, string? role)
+        {
+            if (string.IsNullOrWhiteSpace(oldid)
+                || string.IsNullOrWhiteSpace(identifiant)
+                || string.IsNullOrWhiteSpace(nom)
+                || string.IsNullOrWhiteSpace(prenom)
+                || string.IsNullOrWhiteSpace(motDePasse)
+                || string.IsNullOrWhiteSpace(role)
+                )
+            {
+                return new JsonResult(2); // champ manquant
+            }
+
+            // Vérification de la présence de l'utilisateur à entrer dans la base
+            string constraintQuery = "SELECT * FROM utilisateurs where identifiant=@oldid";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(constraintQuery))
+            {
+                cmd.Parameters.AddWithValue("@oldid", oldid);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (!reader.Read())
+                        return new JsonResult(3); // l'élément n'existe pas
+                }
+            }
+
+            string query = "UPDATE utilisateurs SET identifiant = @identifiant ,nom = @nom, prenom = @prenom, nopermis = @nopermis, motdepasse = @motDePasse, role = @role WHERE identifiant = @oldid";
+
+            if (string.IsNullOrWhiteSpace(nopermis))
+            {
+                query = "UPDATE utilisateurs SET identifiant = @identifiant ,nom = @nom, prenom = @prenom, motdepasse = @motDePasse, role = @role WHERE identifiant = @oldid";
+            }
+
+            using (var cmd = dataSource.CreateCommand(query))
+            {
+                cmd.Parameters.AddWithValue("@oldid", oldid);
+                cmd.Parameters.AddWithValue("@identifiant", identifiant);
+                cmd.Parameters.AddWithValue("@nom", nom);
+                cmd.Parameters.AddWithValue("@prenom", prenom);
+                if (!string.IsNullOrWhiteSpace(nopermis))
+                    cmd.Parameters.AddWithValue("@nopermis", nopermis);
+                cmd.Parameters.AddWithValue("@motDePasse", motDePasse);
+                cmd.Parameters.AddWithValue("@role", role);
+
+                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+                if (result == 0) // si ca n'a pas fonctionné
+                {
+                    return new JsonResult(5);
+                }
+                try
+                {
+                    
+                }
+                catch
+                {
+                    return new JsonResult(6);
+                }
+            }
+
+            return new JsonResult(1); // fonctionnement correcte
+        }
+
+        [HttpPost]
         public JsonResult DeleteUser(string? identifiant)
         {
             if (string.IsNullOrWhiteSpace(identifiant))
@@ -155,7 +234,7 @@ namespace CTVR_API.Controllers
                     return new JsonResult(3);
                 }
             }
-            
+
             return new JsonResult(1);
         }
 
@@ -182,7 +261,9 @@ namespace CTVR_API.Controllers
                     if (reader.Read())
                     {
                         var result = new Dictionary<string, string>();
-                        result.Add("role", reader.GetString(4));
+                        result.Add("role", reader.GetString(5));
+                        if (string.Equals(reader.GetString(5), "CHF"))
+                            result.Add("nopermis", reader.GetString(1));
                         return new JsonResult(result); // identifiant et mot de passe correspondants
                     }
                 }
