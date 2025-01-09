@@ -180,7 +180,7 @@ namespace CTVR_API.Controllers
             return new JsonResult(1); // Ajout réussi
         }
 
-        [HttpDelete]
+        [HttpPost]
         public JsonResult DeleteParcours(string nopermis, DateTime horaireservice)
         {
             if (nopermis == null || horaireservice == null)
