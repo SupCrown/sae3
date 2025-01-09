@@ -114,7 +114,7 @@ namespace CTVR_API.Controllers
             return new JsonResult(1); // fonctionnement correcte
         }
 
-        [HttpDelete]
+        [HttpPost]
         public JsonResult Deletebus(string? immat)
         {
             if (string.IsNullOrWhiteSpace(immat))
@@ -131,11 +131,17 @@ namespace CTVR_API.Controllers
             {
                 cmd.Parameters.AddWithValue("@immat", immat);
 
-                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
-
-                if (result == 0) // si ca n'a pas fonctionné
+                try
                 {
-                    return new JsonResult(3);
+                    int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+                    if (result == 0) // si ca n'a pas fonctionné
+                    {
+                        return new JsonResult(3);
+                    }
+                }
+                catch
+                {
+                    return new JsonResult(7);
                 }
             }
 

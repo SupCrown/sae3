@@ -118,7 +118,7 @@ namespace CTVR_API.Controllers
             return new JsonResult(1); // fonctionnement correcte
         }
 
-        [HttpDelete]
+        [HttpPost]
         public JsonResult DeleteLigne(Int16? noligne)
         {
             if (noligne == null)

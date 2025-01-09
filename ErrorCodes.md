@@ -8,3 +8,4 @@
 |4|L'élément exitste déjà|
 |5|Rien n'as été modifié|
 |6|la valeur d'un champ n'existe pas|
+|7|le champ à supprimer est utilisé dans une autre table|
