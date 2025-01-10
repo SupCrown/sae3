@@ -197,12 +197,17 @@ namespace CTVR_API.Controllers
             {
                 cmd.Parameters.AddWithValue("@nopermis", nopermis);
                 cmd.Parameters.AddWithValue("@horaireservice", horaireservice);
-
-                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
-
-                if (result == 0) // si ca n'a pas fonctionné
+                try
                 {
-                    return new JsonResult(3);
+                    int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+                    if (result == 0) // si ca n'a pas fonctionné
+                    {
+                        return new JsonResult(3);
+                    }
+                }
+                catch
+                {
+                    return new JsonResult(7);
                 }
             }
 

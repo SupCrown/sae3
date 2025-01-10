@@ -134,13 +134,19 @@ namespace CTVR_API.Controllers
             using (var cmd = dataSource.CreateCommand(query))
             {
                 cmd.Parameters.AddWithValue("@noligne", noligne);
-
-                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de Ligne affectées -> 1 si tout se passe bien
-
-                if (result == 0) // si ca n'a pas fonctionné
+                try
                 {
-                    return new JsonResult(3);
+                    int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de Ligne affectées -> 1 si tout se passe bien
+                    if (result == 0) // si ca n'a pas fonctionné
+                    {
+                        return new JsonResult(3);
+                    }
                 }
+                catch
+                {
+                    return new JsonResult(7);
+                }
+                
             }
 
             return new JsonResult(1);

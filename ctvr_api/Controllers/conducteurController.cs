@@ -153,7 +153,7 @@ namespace CTVR_API.Controllers
             return new JsonResult(1); // fonctionnement correcte
 
         }
-        [HttpDelete]
+        [HttpPost]
         public JsonResult deleteConducteur(string? nopermis)
         {
             if (string.IsNullOrWhiteSpace(nopermis))
@@ -169,12 +169,17 @@ namespace CTVR_API.Controllers
             using (var cmd = dataSource.CreateCommand(query))
             {
                 cmd.Parameters.AddWithValue("@nopermis", nopermis);
-
-                int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
-
-                if (result == 0) // si ca n'a pas fonctionné
+                try
                 {
-                    return new JsonResult(3);
+                    int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie le nombre de lignes affectées -> 1 si tout se passe bien
+                    if (result == 0) // si ca n'a pas fonctionné
+                    {
+                        return new JsonResult(3);
+                    }
+                }
+                catch
+                {
+                    return new JsonResult(7);
                 }
             }
 

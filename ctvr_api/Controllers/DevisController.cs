@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Collections.Generic;
@@ -458,7 +459,7 @@ namespace CTVR_API.Controllers
 
 
 
-
+        [EnableCors]
         [HttpPost]
         public JsonResult AddDevis(Int16 norep, Dictionary<string, Dictionary<string, int>> dicoDevis)
         {

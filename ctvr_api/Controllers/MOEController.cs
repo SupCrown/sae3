@@ -17,7 +17,7 @@ namespace CTVR_API.Controllers
         [HttpGet]
         public JsonResult GetAllmoe()
         {
-            string query = "SELECT * FROM moe";
+            string query = "SELECT * FROM moe ORDER BY libelleM";
 
             List<MOE> moes = new List<MOE>();
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
@@ -71,6 +71,32 @@ namespace CTVR_API.Controllers
                 }
             }
             return new JsonResult(3); // l'élément n'existe pas
+        }
+
+        [HttpGet]
+        public JsonResult CheckMOE(string? code)
+        {
+            if (code == null)
+            {
+                return new JsonResult(2);
+            }
+            string query = "SELECT * FROM moe WHERE codem=@code";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
+
+            using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
+            {
+                cmd.Parameters.AddWithValue("@code", code);
+                using (var reader = cmd.ExecuteReader()) // exécute la commande et renvoie un reader qui peut parcourir le resultat
+                {
+                    if (reader.Read())
+                    {
+                        return new JsonResult(true);
+                    }
+                    return new JsonResult(false);
+                }
+            }
         }
 
     }
