@@ -211,7 +211,7 @@ export default {
       }
     },
     async insertCodeFournituresDevis(piece: any) {
-      let res = await fetch("https://localhost:5107/api/fournitures/useFourniturte?norep=" + localStorage.getItem("norep") + "&codef=" + piece.nom + "&qtedevis=" + piece.qte, {
+      let res = await fetch("http://localhost:5107/api/fournitures/useFourniturte?norep=" + localStorage.getItem("norep") + "&codef=" + piece.nom + "&qtedevis=" + piece.qte, {
         method: "POST"
       })
       let data = await res.json()

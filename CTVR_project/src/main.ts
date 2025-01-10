@@ -42,7 +42,7 @@ const router = createRouter({
         {path: '/servicesAdmin/consulterAccidentUnique', name: 'ConsulterAccidentUnique', component: ConsulterAccidentUnique},
         {path: '/servicesAdmin/gestionConducteurs', name: 'GestionConducteur', component: GestionConducteurs},
         {path: '/servicesAdmin/consulterDevis', name: 'ConsulterDevis', component: ConsulterDevis},
-        {path: '/servicesAdmin//saisieDevis', name:'SaisieDevis', component: SaisieDevis},
+        {path: '/servicesAdmin/saisieDevis', name:'SaisieDevis', component: SaisieDevis},
         {path: '/admin', name: 'AcceuilAdmin', component: AcceuilAdmin},
         {path: '/admin/gestionConducteurs', name: 'GestionConducteurAd', component: GestionConducteursAd},
         {path: '/admin/gestionEntretiens', name: 'GestionEntretiensAd', component: GestionEntretiensAd},
@@ -52,8 +52,7 @@ const router = createRouter({
         {path: '/admin/consulterAccidents', name:'ConsulterAccidentsAd', component: ConsulterAccidentsAd},
         {path: '/admin/consulterAccidentUnique', name:'ConsulterAccidentUniqueAd', component: ConsulterAccidentUniqueAd},
         {path: '/admin/gestionUtilisateurs', name: 'GestionUtilisateurs', component: GestionUtilisateurs},
-        {path: '/conducteur', name: 'AcceuilConducteur', component: AcceuilConducteur},
-        
+        {path: '/conducteur', name: 'AcceuilConducteur', component: AcceuilConducteur} 
     ]
 })
 
