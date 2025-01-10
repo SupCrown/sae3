@@ -7,8 +7,8 @@ namespace CTVR_API
     {
 
         public DateOnly? dateCreation { get; set; }
-        public List<string> codeF { get; set; }
-        public List<string> codeM { get; set; }
+        public List<Dictionary<string, object>> fourniture { get; set; }
+        public List<Dictionary<string, object>> mainOeuvre { get; set; }
 
         public double? totalMoe { get; set; }
 
@@ -54,7 +54,9 @@ namespace CTVR_API
                 ? (double?)fields["prixTTC"]
                 : null;
 
-            codeF = new List<string>();
+            fourniture = new List<Dictionary<string, object>>();
+            mainOeuvre = new List<Dictionary<string, object>>();
+
 
         }
     }

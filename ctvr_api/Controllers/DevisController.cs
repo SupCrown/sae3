@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using System.Collections.Generic;
 
 namespace CTVR_API.Controllers
 {
@@ -21,8 +22,10 @@ namespace CTVR_API.Controllers
             string queryUtil = "SELECT * FROM utiliser where norep not in (select norep from necessiter where nbhdevis = nbhvalidees);";
 
             List<Devis> allDevis = new List<Devis>();
-            List<string> listCodeF = new List<string>();
-            List<string> listCodeM = new List<string>();
+            Dictionary<string, object> listCodeF = [];
+            Dictionary<string, object> listCodeM = [];
+            List<Dictionary<string, object>> listQuantite = [];
+            List<Dictionary<string, object>> listMoe = [];
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
@@ -55,17 +58,19 @@ namespace CTVR_API.Controllers
                             }//fin de la recup de la date
 
                             //recuperation des fournitures
-                            string queryCodeM = "SELECT codeM FROM necessiter where norep=@norep";
+                            string queryCodeM = "SELECT codeM, nbhdevis FROM necessiter where norep=@norep";
                             using (var cmdCodeM = dataSource.CreateCommand(queryCodeM)) // preparation de la commande
                             {
-                                listCodeM = new List<string>();
                                 cmdCodeM.Parameters.AddWithValue("@norep", readerUtil.GetInt16(0)); // ajout du paramètre norep recuperé dans la table utiliser
 
                                 using (var readerCodeM = cmdCodeM.ExecuteReader())
                                 {
                                     while (readerCodeM.Read()) // tant qu'on a un retour
                                     {
-                                        listCodeM.Add(readerCodeM.GetString(0));
+                                        listCodeM = new Dictionary<string, object>();
+                                        listCodeM.Add("code", readerCodeM.GetString(0));
+                                        listCodeM.Add("qte", readerCodeM.GetInt32(1));
+                                        listMoe.Add(listCodeM);
 
                                     }
 
@@ -73,17 +78,22 @@ namespace CTVR_API.Controllers
                             }//fin de la recup des fournitures. Elle n'ont pas été ajouté à devisField mais seront ajouté directement au futur object
 
                             //recuperation des fournitures
-                            string queryCodeF = "SELECT codeF FROM utiliser where norep=@norep";
+                            string queryCodeF = "SELECT codeF, qtedevis FROM utiliser where norep=@norep";
                             using (var cmdCodeF = dataSource.CreateCommand(queryCodeF)) // preparation de la commande
                             {
-                                listCodeF = new List<string>();
+                           
                                 cmdCodeF.Parameters.AddWithValue("@norep", readerUtil.GetInt16(0)); // ajout du paramètre norep recuperé dans la table utiliser
+
 
                                 using (var readerCodeF = cmdCodeF.ExecuteReader())
                                 {
                                     while (readerCodeF.Read()) // tant qu'on a un retour
                                     {
-                                        listCodeF.Add(readerCodeF.GetString(0));
+                                        listCodeF = new Dictionary<string, object>();
+                                        listCodeF.Add("code", readerCodeF.GetString(0));
+                                        listCodeF.Add("qte", readerCodeF.GetInt32(1));
+                                        listQuantite.Add(listCodeF);
+
 
                                     }
 
@@ -137,8 +147,8 @@ namespace CTVR_API.Controllers
 
 
                             Devis theDevis = new Devis(devisFields);
-                            theDevis.codeF = listCodeF;
-                            theDevis.codeM = listCodeM;
+                            theDevis.fourniture = listQuantite;
+                            theDevis.mainOeuvre = listMoe;
                             allDevis.Add(theDevis);
                         }
 
@@ -155,8 +165,11 @@ namespace CTVR_API.Controllers
             string queryUtil = "SELECT * FROM utiliser where norep = @norep";
 
             List<Devis> allDevis = new List<Devis>();
-            List<string> listCodeF = new List<string>();
-            List<string> listCodeM = new List<string>();
+            Dictionary<string, object> listCodeF = [];
+            Dictionary<string, object> listCodeM = [];
+            List<Dictionary<string, object>> listQuantite = [];
+            List<Dictionary<string, object>> listMoe = [];
+
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
@@ -190,17 +203,20 @@ namespace CTVR_API.Controllers
                             }//fin de la recup de la date
 
                             //recuperation des fournitures
-                            string queryCodeM = "SELECT codeM FROM necessiter where norep=@norep";
+                            string queryCodeM = "SELECT codeM, nbhdevis FROM necessiter where norep=@norep";
                             using (var cmdCodeM = dataSource.CreateCommand(queryCodeM)) // preparation de la commande
                             {
-                                listCodeM = new List<string>();
+                               
                                 cmdCodeM.Parameters.AddWithValue("@norep", readerUtil.GetInt16(0)); // ajout du paramètre norep recuperé dans la table utiliser
 
                                 using (var readerCodeM = cmdCodeM.ExecuteReader())
                                 {
                                     while (readerCodeM.Read()) // tant qu'on a un retour
                                     {
-                                        listCodeM.Add(readerCodeM.GetString(0));
+                                        listCodeM = new Dictionary<string, object>();
+                                        listCodeM.Add("code", readerCodeM.GetString(0));
+                                        listCodeM.Add("qte", readerCodeM.GetInt32(1));
+                                        listMoe.Add(listCodeM);
 
                                     }
 
@@ -208,17 +224,19 @@ namespace CTVR_API.Controllers
                             }//fin de la recup des fournitures. Elle n'ont pas été ajouté à devisField mais seront ajouté directement au futur object
 
                             //recuperation des fournitures
-                            string queryCodeF = "SELECT codeF FROM utiliser where norep=@norep";
+                            string queryCodeF = "SELECT codeF, qtedevis FROM utiliser where norep=@norep";
                             using (var cmdCodeF = dataSource.CreateCommand(queryCodeF)) // preparation de la commande
                             {
-                                listCodeF = new List<string>();
                                 cmdCodeF.Parameters.AddWithValue("@norep", readerUtil.GetInt16(0)); // ajout du paramètre norep recuperé dans la table utiliser
 
                                 using (var readerCodeF = cmdCodeF.ExecuteReader())
                                 {
                                     while (readerCodeF.Read()) // tant qu'on a un retour
                                     {
-                                        listCodeF.Add(readerCodeF.GetString(0));
+                                        listCodeF = new Dictionary<string, object>();
+                                        listCodeF.Add("code", readerCodeF.GetString(0));
+                                        listCodeF.Add("qte", readerCodeF.GetInt32(1));
+                                        listQuantite.Add(listCodeF);
 
                                     }
 
@@ -272,8 +290,8 @@ namespace CTVR_API.Controllers
 
 
                             Devis theDevis = new Devis(devisFields);
-                            theDevis.codeF = listCodeF;
-                            theDevis.codeM = listCodeM;
+                            theDevis.fourniture = listQuantite;
+                            theDevis.mainOeuvre = listMoe;
                             allDevis.Add(theDevis);
                         }
 
