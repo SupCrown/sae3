@@ -156,7 +156,7 @@ namespace CTVR_API.Controllers
             return new JsonResult(new List<Object> { accidentFields });
         }
 
-        [HttpPut]
+        [HttpPost]
         public JsonResult Insert(DateTime? dateAccident, string? rue, string? codepostal, string? ville, string? resumecirconstances, Intemperie? intemp)
         {
             if (dateAccident == null ||
@@ -242,7 +242,7 @@ namespace CTVR_API.Controllers
 
         }
 
-        [HttpPut]
+        [HttpPost]
         public JsonResult PutDateTransmissionAssur(int? annee, int? noseq, DateOnly? date)
         {
             if (annee == null || noseq == null)
@@ -289,7 +289,7 @@ namespace CTVR_API.Controllers
             return new JsonResult(1);
         }
 
-        [HttpPut]
+        [HttpPost]
         public JsonResult PutDateValidationAssur(int? annee, int? noseq, DateOnly? date)
         {
             if (annee == null || noseq == null)
@@ -335,7 +335,7 @@ namespace CTVR_API.Controllers
             return new JsonResult(1);
         }
 
-        [HttpPut]
+        [HttpPost]
         public JsonResult PutDateClotureDossier(int? annee, int? noseq, DateOnly? date)
         {
             if (annee == null || noseq == null)
@@ -381,7 +381,7 @@ namespace CTVR_API.Controllers
             return new JsonResult(1);
         }
 
-        [HttpPut]
+        [HttpPost]
         public JsonResult PutSommeRecue(int? annee, int? noseq, int? somme)
         {
             if (annee == null || noseq == null || somme == null)

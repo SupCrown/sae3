@@ -73,6 +73,7 @@ namespace ctvr_api.Controllers
                 cmd.Parameters.AddWithValue("@villetiers", villetiers);
                 using (var reader = cmd.ExecuteReader())
                 {
+                    reader.Read();
                     return new JsonResult(reader.GetInt32(0));
                 }
             }

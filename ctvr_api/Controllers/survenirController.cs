@@ -15,7 +15,7 @@ namespace CTVR_API.Controllers
         }
 
         [HttpPost]
-        public JsonResult addConducteur(string? nopermis, TimeOnly? heure, DateOnly? date, Int16? annee, Int16? noseq, string? dmgBus, string? dmgConducteur, bool signatureConduct, bool signatureControl)
+        public JsonResult addSurvenir(string? nopermis, TimeOnly? heure, DateOnly? date, Int16? annee, Int16? noseq, string? dmgBus, string? dmgConducteur, bool signatureConduct, bool signatureControl)
         {
             if (string.IsNullOrWhiteSpace(nopermis)
                 || heure == null
@@ -113,7 +113,7 @@ namespace CTVR_API.Controllers
 
             // Combinaison de DateOnly et TimeOnly
             DateTime timing = date.Value.ToDateTime(heure.Value);
-
+            
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             using (var dataSource = NpgsqlDataSource.Create(connectionString))
             {
