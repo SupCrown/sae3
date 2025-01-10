@@ -86,7 +86,7 @@ namespace CTVR_API.Controllers
                         conducteurResult.Add(conducteur);
                         return new JsonResult(conducteurResult);
                     }
-                }   
+                }
             }
             return new JsonResult(3); // l'élément n'existe pas
         }
@@ -250,7 +250,30 @@ namespace CTVR_API.Controllers
             return new JsonResult(1); // fonctionnement correcte
         }
 
+        [HttpGet]
+        public JsonResult checkConducteur(string? nopermis)
+        {
+            if (string.IsNullOrWhiteSpace(nopermis))
+                return new JsonResult(2);
 
+            // Vérification de la présence du Conducteur à modifier dans la base
+            string constraintQuery = "SELECT * FROM Conducteur where nopermis=@nopermis";
 
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(constraintQuery))
+            {
+                cmd.Parameters.AddWithValue("@nopermis", nopermis);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new JsonResult(true); // L'élément n'existe pas
+                    }
+                    return new JsonResult(false);
+                }
+            }
+        }
     }
 }

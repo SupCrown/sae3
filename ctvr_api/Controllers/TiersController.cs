@@ -28,7 +28,7 @@ namespace ctvr_api.Controllers
                 return new JsonResult(2);
             }
 
-            string query = "SELECT notiers FROM tiers WHERE nomtiers=@nomtiers AND prenomtiers=@prenomtiers";
+            string query = "SELECT notiers FROM tiers WHERE nomtiers=@nomtiers AND prenomtiers=@prenomtiers AND datenaissance=@datenaissance AND adressetiers=@adressetiers AND cptiers=@cptiers AND villetiers=@villetiers";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
             NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
@@ -37,9 +37,13 @@ namespace ctvr_api.Controllers
             {
                 cmd.Parameters.AddWithValue("@nomtiers", nomtiers);
                 cmd.Parameters.AddWithValue("@prenomtiers", prenomtiers);
+                cmd.Parameters.AddWithValue("@datenaissance", datenaissance);
+                cmd.Parameters.AddWithValue("@adressetiers", adressetiers);
+                cmd.Parameters.AddWithValue("@cptiers", cptiers);
+                cmd.Parameters.AddWithValue("@villetiers", villetiers);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read()) return new JsonResult(4);
+                    if (reader.Read()) return new JsonResult(reader.GetInt64(0)); // si on a exactement le même alors on renvoie le numéro tiers
                 }
             }
 
@@ -55,25 +59,21 @@ namespace ctvr_api.Controllers
                 cmd.Parameters.AddWithValue("@villetiers", villetiers);
 
                 int result = cmd.ExecuteNonQuery(); // exécute la commande et renvoie un reader qui peut parcourir le resultat
-
-                if (result == 0) // si ca n'a pas fonctionné
-                {
-                    return new JsonResult(5);
-                }
-
             }
 
-            query = "SELECT notiers FROM tiers WHERE nomtiers=@nomtiers AND prenomtiers=@prenomtiers";
-            int notiers;
+            query = "SELECT notiers FROM tiers WHERE nomtiers=@nomtiers AND prenomtiers=@prenomtiers AND datenaissance=@datenaissance AND adressetiers=@adressetiers AND cptiers=@cptiers AND villetiers=@villetiers";
 
             using (var cmd = dataSource.CreateCommand(query))
             {
                 cmd.Parameters.AddWithValue("@nomtiers", nomtiers);
                 cmd.Parameters.AddWithValue("@prenomtiers", prenomtiers);
+                cmd.Parameters.AddWithValue("@datenaissance", datenaissance);
+                cmd.Parameters.AddWithValue("@adressetiers", adressetiers);
+                cmd.Parameters.AddWithValue("@cptiers", cptiers);
+                cmd.Parameters.AddWithValue("@villetiers", villetiers);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read()) return new JsonResult(reader.GetInt32(0));
-                    else return new JsonResult(5);
+                    return new JsonResult(reader.GetInt32(0));
                 }
             }
         }

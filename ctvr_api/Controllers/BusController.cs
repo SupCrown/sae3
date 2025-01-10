@@ -148,5 +148,30 @@ namespace CTVR_API.Controllers
             return new JsonResult(1);
         }
 
+        [HttpGet]
+        public JsonResult checkBus(string? immat)
+        {
+            if (string.IsNullOrWhiteSpace(immat))
+                return new JsonResult(2);
+
+            // Vérification de la présence du Conducteur à modifier dans la base
+            string constraintQuery = "SELECT * FROM Bus WHERE immat=@immat";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString);
+
+            using (var cmd = dataSource.CreateCommand(constraintQuery))
+            {
+                cmd.Parameters.AddWithValue("@immat", immat);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new JsonResult(true); // L'élément n'existe pas
+                    }
+                    return new JsonResult(false);
+                }
+            }
+        }
     }
 }
