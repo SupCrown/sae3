@@ -1168,11 +1168,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj",
+      "projectUniqueName": "/home/josua/Bureau/CTVR/sae3.01/ctvr_api/ctvr_api.csproj",
       "projectName": "ctvr_api",
-      "projectPath": "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj",
+      "projectPath": "/home/josua/Bureau/CTVR/sae3.01/ctvr_api/ctvr_api.csproj",
       "packagesPath": "/home/josua/.nuget/packages/",
-      "outputPath": "/home/josua/Bureau/school/sae3.01/ctvr_api/obj/",
+      "outputPath": "/home/josua/Bureau/CTVR/sae3.01/ctvr_api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/josua/.nuget/NuGet/NuGet.Config"
@@ -1235,13 +1235,5 @@
         "runtimeIdentifierGraphPath": "/snap/dotnet-sdk/254/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Une erreur s’est produite lors de l’obtention des données de vulnérabilité du package : Impossible de charger l'index de service pour la source https://api.nuget.org/v3/index.json."
-    }
-  ]
+  }
 }
