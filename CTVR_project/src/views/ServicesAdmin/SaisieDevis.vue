@@ -155,7 +155,7 @@ export default {
     })
 
     const pieces = ref([
-      { nom: '', qte: '' },
+      { nom: '', qte: 0 },
     ]);
 
     const MOs = ref([
@@ -163,7 +163,7 @@ export default {
     ]);
 
     const addPiece = () => {
-      pieces.value.push({ nom: '', qte: '' });
+      pieces.value.push({ nom: '', qte: 0 });
     };
 
     const delPiece = (index: any) => {
@@ -230,10 +230,10 @@ export default {
     verifQte(): boolean {
       let noWrongQte = true
       for (let piece of this.pieces) {
-        noWrongQte = noWrongQte && piece.qte.trim().length > 0
+        noWrongQte = noWrongQte && (piece.qte > 0)
       }
       for (let mo of this.MOs) {
-        noWrongQte = noWrongQte && mo.qteHeure.trim().length > 0
+        noWrongQte = noWrongQte && (mo.qteHeure > 0)
       }
       return noWrongQte
     }
