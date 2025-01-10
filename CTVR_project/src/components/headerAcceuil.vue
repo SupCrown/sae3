@@ -26,7 +26,6 @@ export default defineComponent({
   
 
 methods : {
-
   deconnexion (){
     localStorage.removeItem("role")
     this.$router.push("/")
