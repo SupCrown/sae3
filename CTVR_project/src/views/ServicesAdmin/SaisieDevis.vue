@@ -73,6 +73,7 @@
           Envoyer
         </button>
       </div>
+      <p v-if="!noWrongQte" class="absolute text-red-700">Champ manquant !</p>
     </form>
   </body>
 </template>
@@ -90,7 +91,8 @@ export default {
   },
   data(vm) {
     return {
-      norep: 0
+      norep: 0,
+      noWrongQte: true
     }
   },
   setup() {
@@ -196,18 +198,21 @@ export default {
   },
   methods: {
     async insertDevis() {
-      for (let piece of this.pieces) {
-        await this.insertCodeFournituresDevis(piece)
-      }
-      for (let mo of this.MOs) {
-        await this.insertTypeMainDOeuvreDevis(mo)
-      }
-      let res = await fetch("http://localhost:5107/api/Maintenance/SetDateDevis?norep=" + localStorage.getItem("norep"), {
-        method: "POST"
-      })
-      let data = await res.json()
-      if (data === 1) {
-        this.$router.push("/servicesAdmin/gestionEntretiens")
+      this.noWrongQte = this.verifQte()
+      if (this.noWrongQte) {
+        for (let piece of this.pieces) {
+          await this.insertCodeFournituresDevis(piece)
+        }
+        for (let mo of this.MOs) {
+          await this.insertTypeMainDOeuvreDevis(mo)
+        }
+        let res = await fetch("http://localhost:5107/api/Maintenance/SetDateDevis?norep=" + localStorage.getItem("norep"), {
+          method: "POST"
+        })
+        let data = await res.json()
+        if (data === 1) {
+          this.$router.push("/servicesAdmin/gestionEntretiens")
+        }
       }
     },
     async insertCodeFournituresDevis(piece: any) {
@@ -221,6 +226,16 @@ export default {
         method: "POST"
       })
       let data = await res.json()
+    },
+    verifQte(): boolean {
+      let noWrongQte = true
+      for (let piece of this.pieces) {
+        noWrongQte = noWrongQte && piece.qte.trim().length > 0
+      }
+      for (let mo of this.MOs) {
+        noWrongQte = noWrongQte && mo.qteHeure.trim().length > 0
+      }
+      return noWrongQte
     }
   }
 }
