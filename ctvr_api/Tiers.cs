@@ -5,22 +5,22 @@ namespace CTVR_API
 {
     public class Tiers
     {
-        public int noTiers { get; set; }
-        public string? nomTiers { get; set; }
-        public string? prenomTiers { get; set; }
-        public DateOnly dateNaissance { get; set; }
-        public string? adresseTiers { get; set; }
-        public string? cpTiers { get; set; }
-        public string? villeTiers { get; set; }
+        public int notiers { get; set; }
+        public string? nomtiers { get; set; }
+        public string? prenomtiers { get; set; }
+        public DateOnly datenaissance { get; set; }
+        public string? adressetiers { get; set; }
+        public string? cptiers { get; set; }
+        public string? villetiers { get; set; }
 
         public Tiers(Dictionary<string, object> fields) {
-            noTiers = (int)fields["notiers"];
-            nomTiers = (string)fields["nomtiers"];
-            prenomTiers = (string)fields["prenomtiers"];
-            dateNaissance = (DateOnly)fields["datenaissance"];
-            adresseTiers = (string)fields["adressetiers"];
-            cpTiers = (string)fields["cptiers"];
-            villeTiers = (string)fields["villetiers"];
+            notiers = (int)fields["notiers"];
+            nomtiers = (string)fields["nomtiers"];
+            prenomtiers = (string)fields["prenomtiers"];
+            datenaissance = (DateOnly)fields["datenaissance"];
+            adressetiers = (string)fields["adressetiers"];
+            cptiers = (string)fields["cptiers"];
+            villetiers = (string)fields["villetiers"];
         }
     }
 }

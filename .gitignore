@@ -1,8 +1,2 @@
-ctvr_api/appsettings.json
-ctvr_api/obj/ctvr_api.csproj.nuget.dgspec.json
 .vscode/settings.json
-ctvr_api/obj/ctvr_api.csproj.nuget.dgspec.json
-ctvr_api/obj/ctvr_api.csproj.nuget.g.props
-ctvr_api/obj/ctvr_api.csproj.nuget.g.targets
-ctvr_api/obj/project.assets.json
-ctvr_api/obj/project.nuget.cache
+ctvr_api/appsettings.json

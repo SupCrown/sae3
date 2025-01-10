@@ -4,7 +4,7 @@
     {
         Ouvert,
         Transmit,
-        Valide,
-        Cloturer
+        Validé,
+        Cloturé
     }
 }
