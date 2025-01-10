@@ -107,6 +107,9 @@ namespace CTVR_API.Controllers
                 return new JsonResult(2);
             }
 
+            if (nbhdevis <= 0)
+                return new JsonResult(1);
+
             string query = "INSERT INTO necessiter(norep, codem, nbhdevis, tauxhoraire) VALUES(@norep,@codem,@nbhdevis,(SELECT tauxhorairecourant FROM moe WHERE codem=@codem2))";
 
             string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
