@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 
 namespace CTVR_API.Controllers
@@ -47,7 +48,7 @@ namespace CTVR_API.Controllers
                             interventionFields.Add("dateentreebus",
                                 reader.IsDBNull(1) ? null : DateOnly.FromDateTime(reader.GetDateTime(1)));
                             interventionFields.Add("description", reader.GetString(2)); // TEXT
-                            interventionFields.Add("datedevis",reader.IsDBNull(3) ? null : DateOnly.FromDateTime(reader.GetDateTime(3))); // DATE (NOT NULL)
+                            interventionFields.Add("datedevis", reader.IsDBNull(3) ? null : DateOnly.FromDateTime(reader.GetDateTime(3))); // DATE (NOT NULL)
                             interventionFields.Add("immat", reader.GetString(6)); // TEXT
                             interventionFields.Add("annee",
                                 reader.IsDBNull(7) ? null : reader.GetInt16(7));
@@ -123,10 +124,11 @@ namespace CTVR_API.Controllers
                 constraintQuery = "SELECT * FROM Intervention WHERE description = @description and datedevis =@datedevis and immat = @immat";
                 query = "INSERT INTO Intervention (description, immat, datedevis) VALUES ( @description, @immat, @datedevis)";
                 if (annee != null & noseq != null)
-                { 
+                {
                     constraintQuery = "SELECT * FROM Intervention WHERE description = @description and immat = @immat";
                     query = "INSERT INTO Intervention (description, immat,datedevis, annee, noseq) VALUES ( @description, @immat, @datedevis, @annee, @noseq)";
-                }else
+                }
+                else
                 {
                     constraintQuery = "SELECT * FROM Intervention WHERE description = @description and immat = @immat";
                     query = "INSERT INTO Intervention (description, immat,datedevis) VALUES ( @description, @immat, @datedevis)";
@@ -213,7 +215,7 @@ namespace CTVR_API.Controllers
                 {
                     return new JsonResult(7);
                 }
-                
+
             }
 
             return new JsonResult(1);
@@ -312,6 +314,33 @@ namespace CTVR_API.Controllers
             }
 
             return new JsonResult(1); // Ajout réussi
+        }
+
+        [HttpPost]
+        public JsonResult SetDateDevis(Int16? norep)
+        {
+            if (norep == null)
+            {
+                return new JsonResult(2);
+            }
+
+            string query = "UPDATE intervention SET datedevis=@date WHERE norep=@norep";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
+
+            using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
+            {
+                cmd.Parameters.AddWithValue("@norep", norep);
+                cmd.Parameters.AddWithValue("@date", DateOnly.FromDateTime(DateTime.Now));
+
+                int result = cmd.ExecuteNonQuery();
+                if (result == 0)
+                {
+                    return new JsonResult(5); // Erreur d'insertion
+                }
+                return new JsonResult(1);
+            }
         }
 
     }

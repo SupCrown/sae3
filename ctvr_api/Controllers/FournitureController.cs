@@ -98,6 +98,35 @@ namespace CTVR_API.Controllers
                 }
             }
         }
+
+        [HttpPost]
+        public JsonResult useFourniturte(Int16? norep, string? codef, Int32? qtedevis)
+        {
+            if (norep == null || string.IsNullOrWhiteSpace(codef) || qtedevis == null)
+            {
+                return new JsonResult(2);
+            }
+
+            string query = "INSERT INTO utiliser(norep, codef, qtedevis, prixunitaire) VALUES(@norep,@codef,@qtedevis,(SELECT prixunitairecourant FROM fourniture WHERE codef=@codef2))";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
+
+            using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
+            {
+                cmd.Parameters.AddWithValue("@norep", norep);
+                cmd.Parameters.AddWithValue("@codef", codef);
+                cmd.Parameters.AddWithValue("@codef2", codef);
+                cmd.Parameters.AddWithValue("@qtedevis", qtedevis);
+                
+                int result = cmd.ExecuteNonQuery();
+                if (result == 0)
+                {
+                    return new JsonResult(5); // Erreur d'insertion
+                }
+                return new JsonResult(1);
+            }
+        }
     }
 
 }

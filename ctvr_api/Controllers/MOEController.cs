@@ -99,6 +99,35 @@ namespace CTVR_API.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult useMOE(Int16? norep, string? codem, Int32? nbhdevis)
+        {
+            if (norep == null || string.IsNullOrWhiteSpace(codem) || nbhdevis == null)
+            {
+                return new JsonResult(2);
+            }
+
+            string query = "INSERT INTO necessiter(norep, codem, nbhdevis, tauxhoraire) VALUES(@norep,@codem,@nbhdevis,(SELECT tauxhorairecourant FROM moe WHERE codem=@codem2))";
+
+            string connectionString = _configuration.GetConnectionString("ctvrtestsDBConn");
+            NpgsqlDataSource dataSource = NpgsqlDataSource.Create(connectionString); // connexion
+
+            using (var cmd = dataSource.CreateCommand(query)) // preparation de la commande
+            {
+                cmd.Parameters.AddWithValue("@norep", norep);
+                cmd.Parameters.AddWithValue("@codem", codem);
+                cmd.Parameters.AddWithValue("@codem2", codem);
+                cmd.Parameters.AddWithValue("@nbhdevis", nbhdevis);
+
+                int result = cmd.ExecuteNonQuery();
+                if (result == 0)
+                {
+                    return new JsonResult(5); // Erreur d'insertion
+                }
+                return new JsonResult(1);
+            }
+        }
+
     }
 
 }
