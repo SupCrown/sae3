@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj": {}
+    "/home/josua/Bureau/CTVR/sae3.01/ctvr_api/ctvr_api.csproj": {}
   },
   "projects": {
-    "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj": {
+    "/home/josua/Bureau/CTVR/sae3.01/ctvr_api/ctvr_api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj",
+        "projectUniqueName": "/home/josua/Bureau/CTVR/sae3.01/ctvr_api/ctvr_api.csproj",
         "projectName": "ctvr_api",
-        "projectPath": "/home/josua/Bureau/school/sae3.01/ctvr_api/ctvr_api.csproj",
+        "projectPath": "/home/josua/Bureau/CTVR/sae3.01/ctvr_api/ctvr_api.csproj",
         "packagesPath": "/home/josua/.nuget/packages/",
-        "outputPath": "/home/josua/Bureau/school/sae3.01/ctvr_api/obj/",
+        "outputPath": "/home/josua/Bureau/CTVR/sae3.01/ctvr_api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/josua/.nuget/NuGet/NuGet.Config"

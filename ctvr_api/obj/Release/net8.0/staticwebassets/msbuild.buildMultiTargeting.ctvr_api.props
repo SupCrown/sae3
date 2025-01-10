@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/ctvr_api.props" />
+</Project>
